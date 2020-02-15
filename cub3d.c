@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/15 18:39:00 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/15 23:58:07 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,10 @@
 #define KEY_S 1
 #define KEY_D 2
 #define KEY_W 13
+# define KEY_LEFT 123
+# define KEY_RIGHT 124
+# define KEY_DOWN 125
+# define KEY_UP 126
 
 typedef struct 	s_cub
 {
@@ -57,43 +61,22 @@ typedef struct 	s_cub
 	int		lineheight;
 	int		drawstart;
 	int		drawend;
+	void	*mlx_ptr;
+	void	*win_ptr;
+	void	*img_ptr;
 } 				t_cub;
 
-typedef struct 	s_ml
-{
-	void *mlx_ptr;
-	void *win_ptr;
-	void *img_ptr;
-}				t_ml;
+#endif
+#endif
+#endif
+#endif
 
-#endif
-#endif
-#endif
-#endif
-int deal_key(int key, void *param)
+void	ft_view(t_cub *cub)
 {
-	t_cub *cub;
-	cub = (t_cub *) param;
-	if (key == 0)
-	{
-		cub->posx -= 1;
-		write(1,"G", 1);
-	}
-	if (key == 1)
-		cub->posy += 1;
-	if (key == 2)
-		cub->posx +=1;
-	if	(key == 13)
-		cub->posy -= 1;
-	return (0);
-}
-int main()
-{
-	t_cub	*cub;
-	t_ml	*ml;
-	int x;
-	int y;
-	int worldMap[mapWidth][mapHeight]=
+	int	x;
+	int	y;
+	int div;
+	int worldmp[mapWidth][mapHeight]=
 {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -120,23 +103,13 @@ int main()
   {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
-
 	x = 0;
-	if (!(cub = malloc(sizeof(t_cub))))
-		return (0);
-	if (!(ml = malloc(sizeof(t_ml))))
-		return (0);
-	cub->posx = 22;
-	cub->posy = 12;
-	cub->dirx = -1;
-	cub->diry = 0;
 	cub->planex = 0;
 	cub->planey = 0.66;
 	cub->time = 0;
 	cub->oldtime = 0;
-	
-	ml->mlx_ptr = mlx_init();
-	ml->win_ptr = mlx_new_window(ml->mlx_ptr, screenWidth, screenHeight, "Marisco");
+	div = 1;
+	mlx_clear_window(cub->mlx_ptr, cub->win_ptr);
 	while (x < screenWidth)
 	{
 		cub->camerax = 2 * x / (double)screenWidth - 1;
@@ -184,7 +157,7 @@ int main()
 				cub->mapy += cub->stepy;
 				cub->side = 1;
 			}
-			if (worldMap[cub->mapx][cub->mapy] > 0)
+			if (worldmp[cub->mapx][cub->mapy] > 0)
 				cub->hit = 1;
 		}
 	if (cub->side == 0)
@@ -201,12 +174,93 @@ int main()
 	y = cub->drawstart;
 	while (y < cub->drawend)
 	{
-		mlx_pixel_put(ml->mlx_ptr, ml->win_ptr, x, y, 0xFFFFFF);
+		if (cub->side == 1)
+			div = 2;// no sé qué verga le pasa
+		if (worldmp[cub->mapx][cub->mapy] == 2)
+			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xEB0C0C - div);
+		else if (worldmp[cub->mapx][cub->mapy] == 3)
+			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xB605F6 -div);
+		else
+			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xFFE500);
 		y++;
 	}
 	x++;
 	}
-	mlx_key_hook(ml->win_ptr, deal_key, (void *)cub);
-	mlx_loop(ml->mlx_ptr);
+}
+
+int deal_key(int key, void *param)
+{
+		int worldmp[mapWidth][mapHeight]=
+{
+  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
+  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+};
+	t_cub *cub;
+
+	cub = (t_cub *) param;
+	if (key == 0 && !worldmp[(int)cub->posx][(int)cub->posy -1])
+		cub->posy -= 1;
+	if (key == 1 && !worldmp[(int)cub->posx +1][(int)cub->posy])
+		cub->posx += 1;
+	if (key == 2 && !worldmp[(int)cub->posx][(int)cub->posy +1])
+		cub->posy +=1;
+	if	(key == 13 && !worldmp[(int)cub->posx -1][(int)cub->posy])
+		cub->posx -= 1;
+	if	(key == 123)
+	{
+		cub->diry -= 0.1;
+		cub->planey -= 0.1;
+	}
+	if	(key == 124)
+	{
+		cub->diry += 0.1;
+		cub->planey += 0.1;
+	}
+	ft_view(cub);
+	return (0);
+}
+int main()
+{
+	t_cub	*cub;
+	int x;
+
+	x = 0;
+	if (!(cub = malloc(sizeof(t_cub))))
+		return (0);
+	cub->posx = 22;
+	cub->posy = 12;
+	cub->dirx = -1;
+	cub->diry = 0;
+	cub->planex = 0;
+	cub->planey = 0.66;
+	cub->time = 0;
+	cub->oldtime = 0;
+	cub->mlx_ptr = mlx_init();
+	cub->win_ptr = mlx_new_window(cub->mlx_ptr, screenWidth, screenHeight, "Marisco");
+	ft_view(cub);
+	mlx_key_hook(cub->win_ptr, deal_key, (void *)cub);
+	mlx_loop(cub->mlx_ptr);
 	return (0);
 }

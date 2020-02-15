@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cub3d.c                                            :+:      :+:    :+:   */
+/*   pruebas_cub.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/12 21:21:12 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/14 13:01:00 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/15 21:42:12 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ typedef struct 	s_point
 	void *mlx_ptr;
 	void *win_ptr;
 	void *img_ptr;
+	void *img_info;
 	int x;
 	int y;
 }				t_point;
@@ -68,6 +69,13 @@ int main()
 	t_point	*point;
 	int		width;
 	int		height;
+	int 	bpp;
+	int		sl;
+	int endian;
+
+	bpp = 4;
+	sl = 800;
+	endian = 1;
 	
 	width = 50;
 	height = 69;
@@ -77,9 +85,9 @@ int main()
 	point->x = 50;
 	point->win_ptr = mlx_new_window(point->mlx_ptr, 1000, 720, "PAJuo" ); /*win_ptr  hace que las funciones del loop se asocien especificamente con esta ventana*/
 	point->y = 50;
-	mlx_string_put (point->mlx_ptr, point->win_ptr, 200, 200, 0xFFFFFF, "PAJUUUUUUO" );
 	mlx_key_hook(point->win_ptr, deal_key, (void *)point);
-	point->img_ptr = mlx_xpm_file_to_image (point->mlx_ptr, "sonic.xpm", &width, &height);
+	point->img_ptr = mlx_new_image(point->mlx_ptr, 200, 200);
+	point->img_info = (int *)mlx_get_data_addr(point->img_ptr, &bpp, &sl, &endian);
 	mlx_put_image_to_window(point->mlx_ptr, point->win_ptr, point->img_ptr, 40, 20);
 	mlx_loop(point->mlx_ptr); /* hace que se quede esperando a que hagas algo*/
 	return (0);
