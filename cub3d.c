@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/15 23:58:07 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/17 18:26:19 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,13 @@
 # define screenWidth 800
 #ifndef screenHeight 
 # define screenHeight 600
-#define KEY_A 0
 
+#define KEY_A 0
 #define KEY_S 1
 #define KEY_D 2
 #define KEY_W 13
+#define KEY_ESC 53
+
 # define KEY_LEFT 123
 # define KEY_RIGHT 124
 # define KEY_DOWN 125
@@ -39,11 +41,11 @@ typedef struct 	s_cub
 	double	posx; // posiciones de inicio del personaje
 	double	posy;
 	double	dirx; // dirección a la que mira el jugador
+	double	olddirx;
 	double	diry;
 	double	planex; // plano de cámara del jugador -> es perpendicular al de dirección
+	double	oldplanex;
 	double	planey;
-	double	time; // frame actual
-	double	oldtime; // frame anterior -> la diferencia entre time-oldtime sirve para calcular lo que tienes que moverte cuando se aprieta una tecla
 	double	camerax; // lado de la pantalla en el que te encuentras, siendo  0 = centro, 1 = derecha y -1 = izquierda
 	double	raydirx; // dirección rayo de ray casting
 	double	raydiry;
@@ -64,6 +66,8 @@ typedef struct 	s_cub
 	void	*mlx_ptr;
 	void	*win_ptr;
 	void	*img_ptr;
+	double	rotspeed;
+	double	movespeed;
 } 				t_cub;
 
 #endif
@@ -104,10 +108,8 @@ void	ft_view(t_cub *cub)
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 	x = 0;
-	cub->planex = 0;
-	cub->planey = 0.66;
-	cub->time = 0;
-	cub->oldtime = 0;
+	//cub->planex = 0;
+	//cub->planey = 0.66;
 	div = 1;
 	mlx_clear_window(cub->mlx_ptr, cub->win_ptr);
 	while (x < screenWidth)
@@ -177,9 +179,9 @@ void	ft_view(t_cub *cub)
 		if (cub->side == 1)
 			div = 2;// no sé qué verga le pasa
 		if (worldmp[cub->mapx][cub->mapy] == 2)
-			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xEB0C0C - div);
+			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xEB0C0C);
 		else if (worldmp[cub->mapx][cub->mapy] == 3)
-			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xB605F6 -div);
+			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xB605F6);
 		else
 			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xFFE500);
 		y++;
@@ -187,7 +189,11 @@ void	ft_view(t_cub *cub)
 	x++;
 	}
 }
-
+int exit_hook(void *n)
+{
+	exit((int)n);
+	return((int)n);
+}
 int deal_key(int key, void *param)
 {
 		int worldmp[mapWidth][mapHeight]=
@@ -220,24 +226,55 @@ int deal_key(int key, void *param)
 	t_cub *cub;
 
 	cub = (t_cub *) param;
-	if (key == 0 && !worldmp[(int)cub->posx][(int)cub->posy -1])
-		cub->posy -= 1;
-	if (key == 1 && !worldmp[(int)cub->posx +1][(int)cub->posy])
-		cub->posx += 1;
-	if (key == 2 && !worldmp[(int)cub->posx][(int)cub->posy +1])
-		cub->posy +=1;
-	if	(key == 13 && !worldmp[(int)cub->posx -1][(int)cub->posy])
-		cub->posx -= 1;
+
+	if	(key == 13)//W
+	{
+		if (!worldmp[(int)(cub->posx + cub->dirx * cub->movespeed)][(int)cub->posy])
+			cub->posx += cub->dirx * cub->movespeed;
+		if (!worldmp[(int)cub->posx][(int)(cub->posy + cub->diry * cub->movespeed)])
+			cub->posy += cub->diry * cub->movespeed;
+	}
+	if (key == 1)//S
+	{
+		if (!worldmp[(int)(cub->posx - cub->dirx * cub->movespeed)][(int)cub->posy])
+			cub->posx -= cub->dirx * cub->movespeed;
+		if (!worldmp[(int)cub->posx][(int)(cub->posy - cub->diry * cub->movespeed)])
+			cub->posy -=cub->diry * cub->movespeed;
+	}
+	if	(key == 2)//D
+	{
+		if (!worldmp[(int)(cub->posx + cub->planex * cub->movespeed)][(int)cub->posy])
+			cub->posx += cub->planex * cub->movespeed;
+		if (!worldmp[(int)cub->posx][(int)(cub->posy + cub->planey * cub->movespeed)])
+			cub->posy += cub->planey * cub->movespeed;
+	}
+	if	(key == 0)//A
+	{
+		if (!worldmp[(int)(cub->posx - cub->planex * cub->movespeed)][(int)cub->posy])
+			cub->posx -= cub->planex * cub->movespeed;
+		if (!worldmp[(int)cub->posx][(int)(cub->posy - cub->planey * cub->movespeed)])
+			cub->posy -= cub->planey * cub->movespeed;
+	}
 	if	(key == 123)
 	{
-		cub->diry -= 0.1;
-		cub->planey -= 0.1;
+		cub->olddirx = cub->dirx;
+		cub->dirx = cub->dirx * cos(cub->rotspeed) - cub->diry * sin(cub->rotspeed);
+		cub->diry = cub->olddirx * sin(cub->rotspeed) + cub->diry * cos(cub->rotspeed);
+		cub->oldplanex = cub->planex;
+		cub->planex = cub->planex * cos(cub->rotspeed) - cub->planey * sin(cub->rotspeed);
+		cub->planey = cub->oldplanex * sin(cub->rotspeed) + cub->planey * cos(cub->rotspeed);
 	}
 	if	(key == 124)
 	{
-		cub->diry += 0.1;
-		cub->planey += 0.1;
+		cub->olddirx = cub->dirx;
+		cub->dirx = cub->dirx * cos(-cub->rotspeed) - cub->diry * sin(-cub->rotspeed);
+		cub->diry = cub->olddirx * sin(-cub->rotspeed) + cub->diry * cos(-cub->rotspeed);
+		cub->oldplanex = cub->planex;
+		cub->planex = cub->planex * cos(-cub->rotspeed) - cub->planey * sin(-cub->rotspeed);
+		cub->planey = cub->oldplanex * sin(-cub->rotspeed) + cub->planey * cos(-cub->rotspeed);
 	}
+	if (key == 53)
+		exit(0);
 	ft_view(cub);
 	return (0);
 }
@@ -255,12 +292,13 @@ int main()
 	cub->diry = 0;
 	cub->planex = 0;
 	cub->planey = 0.66;
-	cub->time = 0;
-	cub->oldtime = 0;
 	cub->mlx_ptr = mlx_init();
 	cub->win_ptr = mlx_new_window(cub->mlx_ptr, screenWidth, screenHeight, "Marisco");
+	cub->rotspeed  =  0.05;
+	cub->movespeed = 0.5;
 	ft_view(cub);
-	mlx_key_hook(cub->win_ptr, deal_key, (void *)cub);
+	mlx_hook(cub->win_ptr, 2, 0, deal_key, (void *)cub);
+	mlx_hook(cub->win_ptr, 17, 0, exit_hook, (void *)0);
 	mlx_loop(cub->mlx_ptr);
 	return (0);
 }
