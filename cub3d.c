@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/17 19:47:39 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/18 18:27:17 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@
 #ifndef mapHeight 
 # define mapHeight 24
 #ifndef screenWidth 
-# define screenWidth 1400
+# define screenWidth 800
 #ifndef screenHeight 
-# define screenHeight 900
+# define screenHeight 600
 
 #define KEY_A 0
 #define KEY_S 1
@@ -66,6 +66,11 @@ typedef struct 	s_cub
 	void	*mlx_ptr;
 	void	*win_ptr;
 	void	*img_ptr;
+	int	*img_info;
+	int		bpp;
+	int		ls;
+	int		endian;
+	unsigned int *dst;
 	double	rotspeed;
 	double	movespeed;
 	int		a;
@@ -85,7 +90,6 @@ void	ft_view(t_cub *cub)
 {
 	int	x;
 	int	y;
-	int div;
 	int worldmp[mapWidth][mapHeight]=
 {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -98,7 +102,7 @@ void	ft_view(t_cub *cub)
   {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -114,10 +118,8 @@ void	ft_view(t_cub *cub)
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 	x = 0;
-	//cub->planex = 0;
-	//cub->planey = 0.66;
-	div = 1;
-	mlx_clear_window(cub->mlx_ptr, cub->win_ptr);
+	cub->img_ptr = mlx_new_image(cub->mlx_ptr, screenWidth, screenHeight);
+	cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr, &cub->bpp, &cub->ls, &cub->endian);
 	while (x < screenWidth)
 	{
 		cub->camerax = 2 * x / (double)screenWidth - 1;
@@ -182,23 +184,27 @@ void	ft_view(t_cub *cub)
 	y = cub->drawstart;
 	while (y < cub->drawend)
 	{
-		if (cub->side == 1)
-			div = 2;// no sé qué verga le pasa
 		if (worldmp[cub->mapx][cub->mapy] == 2)
-			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xEB0C0C);
+			cub->img_info[y * screenWidth + x] = 0xEB0C0C;
 		else if (worldmp[cub->mapx][cub->mapy] == 3)
-			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xB605F6);
+			cub->img_info[y * screenWidth + x] = 0xB605F6;
 		else
-			mlx_pixel_put(cub->mlx_ptr, cub->win_ptr, x, y, 0xFFE500);
+			cub->img_info[y * screenWidth + x] = 0xFFE500;
 		y++;
 	}
 	x++;
 	}
+	mlx_put_image_to_window(cub->mlx_ptr, cub->win_ptr, cub->img_ptr, 0, 0);
+	mlx_destroy_image(cub->mlx_ptr, cub->img_ptr);
 }
-int exit_hook(void *n)
+int exit_hook(void *param)
 {
-	exit((int)n);
-	return((int)n);
+	t_cub *cub;
+
+	cub = (t_cub *)param;
+	free(cub);
+	exit(0);
+	return(0);
 }
 int move_player(void *param)
 {
@@ -215,7 +221,7 @@ int move_player(void *param)
   {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -301,7 +307,10 @@ int key_pressed(int key, void *param)
 	if (key == 123)
 		cub->left = 1;
 	if (key == 53)
+	{
+		free(cub);
 		exit(0);
+	}
 	return (0);
 }
 
@@ -342,12 +351,12 @@ int main()
 	cub->mlx_ptr = mlx_init();
 	cub->win_ptr = mlx_new_window(cub->mlx_ptr, screenWidth, screenHeight, "Marisco");
 	cub->rotspeed  =  0.05;
-	cub->movespeed = 0.2;
+	cub->movespeed = 0.1;
 	ft_view(cub);
 	mlx_hook(cub->win_ptr, 2, 0, key_pressed, (void *)cub);
 	mlx_hook(cub->win_ptr, 3, 0, key_released, (void *)cub);
 	mlx_loop_hook(cub->mlx_ptr, move_player, (void *)cub);
-	mlx_hook(cub->win_ptr, 17, 0, exit_hook, (void *)0);
+	mlx_hook(cub->win_ptr, 17, 0, exit_hook, (void *)cub);
 	mlx_loop(cub->mlx_ptr);
 	return (0);
 }
