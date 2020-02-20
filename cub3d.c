@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/20 14:10:36 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/20 17:57:14 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,6 @@ typedef struct 	s_cub
 	int	*img_info;
 	int		bpp;
 	int		ls;
-	int		bpp2;
-	int		ls2;
 	int		endian;
 	unsigned int *dst;
 	double	rotspeed;
@@ -100,6 +98,18 @@ typedef struct 	s_cub
 #endif
 #endif
 
+/*oid	ft_fc(t_cub *cub)
+{
+	int x;
+	int y;
+
+	x = 0;
+	y = 0;
+	cub->img_ptr = mlx_new_image(cub->mlx_ptr, screenWidth, screenHeight);
+	cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr, &cub->bpp, &cub->ls, &cub->endian);
+	while()
+}
+*/
 void	ft_textures(t_cub *cub)
 {
 	int x;
@@ -113,10 +123,10 @@ void	ft_textures(t_cub *cub)
 	y = 0;
 	width = 64;
 	height = 64;
-	cub->n_text = mlx_xpm_file_to_image(cub->mlx_ptr, "palacios_nazaries.xpm", &width, &height);
+	cub->n_text = mlx_xpm_file_to_image(cub->mlx_ptr, "new.xpm", &width, &height);
 	cub->n_text_info = (int *)mlx_get_data_addr(cub->n_text, &cub->bpp, &cub->ls, &cub->endian);
-	cub->n_text2 = mlx_xpm_file_to_image(cub->mlx_ptr, "2.xpm", &width, &height);
-	cub->n_text_info2 = (int *)mlx_get_data_addr(cub->n_text2, &cub->bpp2, &cub->ls2, &cub->endian);
+	cub->n_text2 = mlx_xpm_file_to_image(cub->mlx_ptr, "bluestone.xpm", &width, &height);
+	cub->n_text_info2 = (int *)mlx_get_data_addr(cub->n_text2, &cub->bpp, &cub->ls, &cub->endian);
 	cub->texture = malloc(sizeof(int *) * 8);
 	while(i < 8)
 	{
@@ -133,14 +143,14 @@ void	ft_textures(t_cub *cub)
 			//int ycolor = y * 256 / textheight;							Texturas tutorial
 			//int xycolor = y * 128 / textheight + x * 128 / textwidth;		Texturas tutorial
 			//Toda esta verga es para poner nuestras texturas, si descomentas pasa a lo de antes
-			cub->texture[0][textwidth * y + x] = cub->n_text_info[cub->ls * y + x * cub->bpp/8]; //65536 * 254 * (x != y && x != textwidth - y); //flat red texture with black cross			
-    		cub->texture[1][textwidth * y + x] = cub->n_text_info2[cub->ls2 * y + x * cub->bpp2/8]; //xycolor + 256 * xycolor + 65536 * xycolor; //sloped greyscale
-    		cub->texture[2][textwidth * y + x] = cub->n_text_info[cub->ls * y + x * cub->bpp/8]; //256 * xycolor + 65536 * xycolor; //sloped yellow gradient
-    		cub->texture[3][textwidth * y + x] = cub->n_text_info2[cub->ls2 * y + x * cub->bpp2/8];//xorcolor + 256 * xorcolor + 65536 * xorcolor; //xor greyscale
-    		cub->texture[4][textwidth * y + x] = cub->n_text_info[cub->ls * y + x * cub->bpp/8];//256 * xorcolor; //xor green
-    		cub->texture[5][textwidth * y + x] = cub->n_text_info2[cub->ls2 * y + x * cub->bpp2/8];//65536 * 192 * (x % 16 && y % 16); //red bricks
-    		cub->texture[6][textwidth * y + x] = cub->n_text_info[cub->ls * y + x * cub->bpp/8];//65536 * ycolor; //red gradient
-    		cub->texture[7][textwidth * y + x] = cub->n_text_info2[cub->ls2 * y + x * cub->bpp2/8];//128 + 256 * 128 + 65536 * 128; //flat grey texture
+			cub->texture[0] = cub->n_text_info; //65536 * 254 * (x != y && x != textwidth - y); //flat red texture with black cross			
+    		cub->texture[1] = cub->n_text_info2; //xycolor + 256 * xycolor + 65536 * xycolor; //sloped greyscale
+    		cub->texture[2] = cub->n_text_info2; //256 * xycolor + 65536 * xycolor; //sloped yellow gradient
+    		cub->texture[3] = cub->n_text_info;//xorcolor + 256 * xorcolor + 65536 * xorcolor; //xor greyscale
+    		cub->texture[4] = cub->n_text_info2;//256 * xorcolor; //xor green
+    		cub->texture[5] = cub->n_text_info;//65536 * 192 * (x % 16 && y % 16); //red bricks
+    		cub->texture[6] = cub->n_text_info2;//65536 * ycolor; //red gradient
+    		cub->texture[7] = cub->n_text_info;//128 + 256 * 128 + 65536 * 128; //flat grey texture
 			y++;
 		}
 		x++;
