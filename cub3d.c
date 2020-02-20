@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/18 18:27:17 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/20 14:10:36 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,14 @@
 #ifndef mapHeight 
 # define mapHeight 24
 #ifndef screenWidth 
-# define screenWidth 800
+# define screenWidth 1020
 #ifndef screenHeight 
-# define screenHeight 600
+# define screenHeight 780
+#ifndef textwidth 
+# define textwidth 64
+#ifndef textheight 
+# define textheight 64
+
 
 #define KEY_A 0
 #define KEY_S 1
@@ -69,6 +74,8 @@ typedef struct 	s_cub
 	int	*img_info;
 	int		bpp;
 	int		ls;
+	int		bpp2;
+	int		ls2;
 	int		endian;
 	unsigned int *dst;
 	double	rotspeed;
@@ -79,45 +86,102 @@ typedef struct 	s_cub
 	int		d;
 	int		right;
 	int		left;
+	int		**texture;
+	int		*n_text;
+	int 	*n_text_info;
+	int		*n_text2;
+	int 	*n_text_info2;
 } 				t_cub;
 
 #endif
 #endif
 #endif
 #endif
+#endif
+#endif
+
+void	ft_textures(t_cub *cub)
+{
+	int x;
+	int y;
+	int i;
+	int width;
+	int height;
+	
+	i = 0;
+	x = 0;
+	y = 0;
+	width = 64;
+	height = 64;
+	cub->n_text = mlx_xpm_file_to_image(cub->mlx_ptr, "palacios_nazaries.xpm", &width, &height);
+	cub->n_text_info = (int *)mlx_get_data_addr(cub->n_text, &cub->bpp, &cub->ls, &cub->endian);
+	cub->n_text2 = mlx_xpm_file_to_image(cub->mlx_ptr, "2.xpm", &width, &height);
+	cub->n_text_info2 = (int *)mlx_get_data_addr(cub->n_text2, &cub->bpp2, &cub->ls2, &cub->endian);
+	cub->texture = malloc(sizeof(int *) * 8);
+	while(i < 8)
+	{
+		cub->texture[i] = malloc(sizeof(int)* textwidth * textheight);
+		i++;
+	}
+	while (x < textwidth)
+	{
+		y = 0;
+		while (y < textheight)
+		{
+			
+			//int xorcolor = (x * 256 / textwidth) ^ (y * 256 / textheight); Texturas tutorial
+			//int ycolor = y * 256 / textheight;							Texturas tutorial
+			//int xycolor = y * 128 / textheight + x * 128 / textwidth;		Texturas tutorial
+			//Toda esta verga es para poner nuestras texturas, si descomentas pasa a lo de antes
+			cub->texture[0][textwidth * y + x] = cub->n_text_info[cub->ls * y + x * cub->bpp/8]; //65536 * 254 * (x != y && x != textwidth - y); //flat red texture with black cross			
+    		cub->texture[1][textwidth * y + x] = cub->n_text_info2[cub->ls2 * y + x * cub->bpp2/8]; //xycolor + 256 * xycolor + 65536 * xycolor; //sloped greyscale
+    		cub->texture[2][textwidth * y + x] = cub->n_text_info[cub->ls * y + x * cub->bpp/8]; //256 * xycolor + 65536 * xycolor; //sloped yellow gradient
+    		cub->texture[3][textwidth * y + x] = cub->n_text_info2[cub->ls2 * y + x * cub->bpp2/8];//xorcolor + 256 * xorcolor + 65536 * xorcolor; //xor greyscale
+    		cub->texture[4][textwidth * y + x] = cub->n_text_info[cub->ls * y + x * cub->bpp/8];//256 * xorcolor; //xor green
+    		cub->texture[5][textwidth * y + x] = cub->n_text_info2[cub->ls2 * y + x * cub->bpp2/8];//65536 * 192 * (x % 16 && y % 16); //red bricks
+    		cub->texture[6][textwidth * y + x] = cub->n_text_info[cub->ls * y + x * cub->bpp/8];//65536 * ycolor; //red gradient
+    		cub->texture[7][textwidth * y + x] = cub->n_text_info2[cub->ls2 * y + x * cub->bpp2/8];//128 + 256 * 128 + 65536 * 128; //flat grey texture
+			y++;
+		}
+		x++;
+	}
+}
 
 void	ft_view(t_cub *cub)
 {
 	int	x;
 	int	y;
+	int	z;
 	int worldmp[mapWidth][mapHeight]=
 {
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+  {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,7,7,7,7,7,7,7,7},
+  {4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
+  {4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
+  {4,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
+  {4,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
+  {4,0,4,0,0,0,0,5,5,5,5,5,5,5,5,5,7,7,0,7,7,7,7,7},
+  {4,0,5,0,0,0,0,5,0,5,0,5,0,5,0,5,7,0,0,0,7,7,7,1},
+  {4,0,6,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
+  {4,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,1},
+  {4,0,8,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
+  {4,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,7,7,7,1},
+  {4,0,0,0,0,0,0,5,5,5,5,0,5,5,5,5,7,7,7,7,7,7,7,1},
+  {6,6,6,6,6,6,6,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
+  {8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+  {6,6,6,6,6,6,0,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
+  {4,4,4,4,4,4,0,4,4,4,6,0,6,2,2,2,2,2,2,2,3,3,3,3},
+  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
+  {4,0,0,0,0,0,0,0,0,0,0,0,6,2,0,0,5,0,0,2,0,0,0,2},
+  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
+  {4,0,6,0,6,0,0,0,0,4,6,0,0,0,0,0,5,0,0,0,0,0,0,2},
+  {4,0,0,5,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
+  {4,0,6,0,6,0,0,0,0,4,6,0,6,2,0,0,5,0,0,2,0,0,0,2},
+  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
+  {4,4,4,4,4,4,4,4,4,4,1,1,1,2,2,2,2,2,2,3,3,3,3,3}
 };
 	x = 0;
+	y = 0;
+	z = 0;
 	cub->img_ptr = mlx_new_image(cub->mlx_ptr, screenWidth, screenHeight);
 	cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr, &cub->bpp, &cub->ls, &cub->endian);
 	while (x < screenWidth)
@@ -126,8 +190,7 @@ void	ft_view(t_cub *cub)
 		cub->raydirx = cub->dirx + cub->planex * cub->camerax;
 		cub->raydiry = cub->diry + cub->planey * cub->camerax;
 		cub->mapx = (int)cub->posx;
-		cub->mapy = (int)cub->posy
-;
+		cub->mapy = (int)cub->posy;
 		cub->deltadistx = fabs(1 / cub->raydirx);
 		cub->deltadisty = fabs(1 / cub->raydiry);
 		cub->hit = 0;
@@ -170,29 +233,52 @@ void	ft_view(t_cub *cub)
 			if (worldmp[cub->mapx][cub->mapy] > 0)
 				cub->hit = 1;
 		}
-	if (cub->side == 0)
-		cub->perpwalldist = (cub->mapx - cub->posx + (1 - cub->stepx) / 2) / cub->raydirx;
-	else
-		cub->perpwalldist = (cub->mapy - cub->posy + (1 - cub->stepy) / 2) / cub->raydiry;
-	cub->lineheight = (int)(screenHeight / cub->perpwalldist);
-	cub->drawstart = - cub->lineheight / 2 + screenHeight / 2 ;
-	if (cub->drawstart < 0)
-		cub->drawstart = 0;
-	cub->drawend = cub->lineheight / 2 + screenHeight / 2;
-	if (cub->drawend >= screenHeight)
-		cub->drawend = screenHeight -1;
-	y = cub->drawstart;
-	while (y < cub->drawend)
-	{
-		if (worldmp[cub->mapx][cub->mapy] == 2)
-			cub->img_info[y * screenWidth + x] = 0xEB0C0C;
-		else if (worldmp[cub->mapx][cub->mapy] == 3)
-			cub->img_info[y * screenWidth + x] = 0xB605F6;
+		if (cub->side == 0)
+			cub->perpwalldist = (cub->mapx - cub->posx + (1 - cub->stepx) / 2) / cub->raydirx;
 		else
-			cub->img_info[y * screenWidth + x] = 0xFFE500;
-		y++;
-	}
-	x++;
+			cub->perpwalldist = (cub->mapy - cub->posy + (1 - cub->stepy) / 2) / cub->raydiry;
+		cub->lineheight = (int)(screenHeight / cub->perpwalldist);
+		cub->drawstart = - cub->lineheight / 2 + screenHeight / 2 ;
+		if (cub->drawstart < 0)
+			cub->drawstart = 0;
+		cub->drawend = cub->lineheight / 2 + screenHeight / 2;
+		if (cub->drawend >= screenHeight)
+			cub->drawend = screenHeight -1;
+		y = cub->drawstart;
+		int texnum = worldmp[cub->mapx][cub->mapy] - 1;
+		double	wallx;
+		if (cub->side == 0)
+			wallx = cub->posy + cub->perpwalldist * cub->raydiry;
+		else
+			wallx = cub->posx + cub->perpwalldist * cub->raydirx;
+		wallx -= floor(wallx);
+		int texx = (int)(wallx * (double)textwidth);
+		if (cub->side == 0 && cub->raydirx > 0)
+			texx = textwidth - texx -1;
+		if (cub->side == 1 && cub->raydiry < 0)
+			texx = textwidth - texx -1;
+		double step = 1.0 * textheight / cub->lineheight;
+		double texpos = (cub->drawstart - screenHeight / 2 + cub->lineheight / 2) * step; // con 0 debería funcionar igual
+		while(z < y)
+		{
+			cub->img_info[z * screenWidth + x] = 0x99FFFF;
+			z++;
+		}
+		while (y < cub->drawend)
+		{
+			int texy = (int)texpos & (textheight - 1);
+			texpos +=step;
+			cub->img_info[y * screenWidth + x] = cub->texture[texnum][textheight * texy + texx];
+			y++;
+		}
+		z = cub->drawend;
+		while(z < screenHeight)
+		{
+			cub->img_info[z * screenWidth + x] = 0x926521;
+			z++;
+		}
+		z = 0;
+		x++;
 	}
 	mlx_put_image_to_window(cub->mlx_ptr, cub->win_ptr, cub->img_ptr, 0, 0);
 	mlx_destroy_image(cub->mlx_ptr, cub->img_ptr);
@@ -211,33 +297,34 @@ int move_player(void *param)
 	t_cub	*cub;
 		int worldmp[mapWidth][mapHeight]=
 {
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+  {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,7,7,7,7,7,7,7,7},
+  {4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
+  {4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
+  {4,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
+  {4,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
+  {4,0,4,0,0,0,0,5,5,5,5,5,5,5,5,5,7,7,0,7,7,7,7,7},
+  {4,0,5,0,0,0,0,5,0,5,0,5,0,5,0,5,7,0,0,0,7,7,7,1},
+  {4,0,6,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
+  {4,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,1},
+  {4,0,8,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
+  {4,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,7,7,7,1},
+  {4,0,0,0,0,0,0,5,5,5,5,0,5,5,5,5,7,7,7,7,7,7,7,1},
+  {6,6,6,6,6,6,6,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
+  {8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+  {6,6,6,6,6,6,0,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
+  {4,4,4,4,4,4,0,4,4,4,6,0,6,2,2,2,2,2,2,2,3,3,3,3},
+  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
+  {4,0,0,0,0,0,0,0,0,0,0,0,6,2,0,0,5,0,0,2,0,0,0,2},
+  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
+  {4,0,6,0,6,0,0,0,0,4,6,0,0,0,0,0,5,0,0,0,0,0,0,2},
+  {4,0,0,5,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
+  {4,0,6,0,6,0,0,0,0,4,6,0,6,2,0,0,5,0,0,2,0,0,0,2},
+  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
+  {4,4,4,4,4,4,4,4,4,4,1,1,1,2,2,2,2,2,2,3,3,3,3,3}
 };
 
 	cub = (t_cub *)param;
+	
 	if	(cub->w == 1)//W
 	{
 		if (!worldmp[(int)(cub->posx + cub->dirx * cub->movespeed)][(int)cub->posy])
@@ -342,16 +429,17 @@ int main()
 	x = 0;
 	if (!(cub = malloc(sizeof(t_cub))))
 		return (0);
-	cub->posx = 22;
-	cub->posy = 12;
-	cub->dirx = -1;
-	cub->diry = 0;
-	cub->planex = 0;
+	cub->posx = 22.0;
+	cub->posy = 11.5;
+	cub->dirx = -1.0;
+	cub->diry = 0.0;
+	cub->planex = 0.0;
 	cub->planey = 0.66;
 	cub->mlx_ptr = mlx_init();
 	cub->win_ptr = mlx_new_window(cub->mlx_ptr, screenWidth, screenHeight, "Marisco");
 	cub->rotspeed  =  0.05;
 	cub->movespeed = 0.1;
+	ft_textures(cub);
 	ft_view(cub);
 	mlx_hook(cub->win_ptr, 2, 0, key_pressed, (void *)cub);
 	mlx_hook(cub->win_ptr, 3, 0, key_released, (void *)cub);

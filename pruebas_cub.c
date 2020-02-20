@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/12 21:21:12 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/18 17:35:58 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/20 12:34:28 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@ int main()
 	int 	bpp;
 	int		sl;
 	int endian;
-	int	*dst;
 	int j;
 	int i;
 
@@ -91,17 +90,11 @@ int main()
 	point->win_ptr = mlx_new_window(point->mlx_ptr, 1000, 720, "PAJuo" ); /*win_ptr  hace que las funciones del loop se asocien especificamente con esta ventana*/
 	point->y = 50;
 	mlx_key_hook(point->win_ptr, deal_key, (void *)point);
-	point->img_ptr = mlx_new_image(point->mlx_ptr, 200, 200);
-	point->img_info = mlx_get_data_addr(point->img_ptr, &bpp, &sl, &endian);
-	j = 0;
-	while (j < 20)
-	{
-		dst = point->img_info + j * sl + i *(bpp/8);
-		*dst = 0xEB0C0C;
-		j++;
-	}
-	mlx_put_image_to_window(point->mlx_ptr, point->win_ptr, point->img_ptr, 40, 20);
-	mlx_destroy_image(point->mlx_ptr, point->img_ptr);
+	//point->img_ptr = mlx_new_image(point->mlx_ptr, 200, 200);
+	//point->img_info = mlx_get_data_addr(point->img_ptr, &bpp, &sl, &endian);
+	point->img_ptr = mlx_xpm_file_to_image(point->mlx_ptr, "palacios_nazaries.xpm", &width, &height);
+	mlx_put_image_to_window(point->mlx_ptr, point->win_ptr, point->img_ptr, 0, 0);
+	//mlx_destroy_image(point->mlx_ptr, point->img_ptr);
 	mlx_loop(point->mlx_ptr); /* hace que se quede esperando a que hagas algo*/
 	return (0);
 }
