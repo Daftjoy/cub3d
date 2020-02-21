@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:57:51 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/19 19:30:10 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/21 16:29:32 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include "cub3d.h"
 
 int ft_strlen(char *s)
 {
@@ -169,49 +170,32 @@ int get_next_line(char **line, int fd)
 }
 
 
-int main()
+void ft_read_map(t_cub *cub, char *map_path)
 {
 	char *line;
 	int fd;
-	char **map;
+	int **map;
 	int i;
 	int j;
 	int height;
 	int width;
-	int screenwidth;
-	int screenheight;
-	char *path_no;
-	char *path_so;
-	char *path_we;
-	char *path_ea;
-	char *path_sprite;
-	char *floor;
-	char *ceiling;
 	
-	screenheight = 0;
-	screenheight = 0;
+	cub->screenheight = 0;
+	cub->screenwidth = 0;
 	i = 0;
 	j = 0;
 	height = 0;
 	width = 0;
-	path_no = malloc(sizeof(char) * 100);
-	path_so = malloc(sizeof(char) * 100);
-	path_we = malloc(sizeof(char) * 100);
-	path_ea = malloc(sizeof(char) * 100);
-	path_sprite = malloc(sizeof(char) * 100);
-	floor = malloc(sizeof(char) * 100);
-	ceiling = malloc(sizeof(char) * 100);
-	/*if(!(map = malloc(sizeof(char * ) *13)))
-		return (0);
-	while (i < 24)
-	{
-		if(!(map[i] = malloc(sizeof(char) *57)))
-			return (0);
-		i++;
-	}*/
+	cub->path_no = malloc(sizeof(char) * 100);
+	cub->path_so = malloc(sizeof(char) * 100);
+	cub->path_we = malloc(sizeof(char) * 100);
+	cub->path_ea = malloc(sizeof(char) * 100);
+	cub->path_sprite = malloc(sizeof(char) * 100);
+	cub->floor_color = malloc(sizeof(char) * 100);
+	cub->ceiling_color = malloc(sizeof(char) * 100);
 	i = 0;
 	line = NULL;
-	fd = open("map1.cub", O_RDONLY);
+	fd = open(map_path, O_RDONLY);
 	while(get_next_line(&line, fd) >0)
 	{	
 		if(line[0] >= '0' && line[0] <= '9')
@@ -221,34 +205,51 @@ int main()
 		height++;
 	width = ft_strlen(line);
 	free(line);
-	if(!(map = malloc(sizeof(char * ) *height)))
-		return (0);
-	while (i < height)
+	if(!(map = malloc(sizeof(int *) *height)))
+		return;
+	while (j < height)
 	{
-		if(!(map[i] = malloc(sizeof(char) *width)))
-			return (0);
-		i++;
+		if(!(map[j] = malloc(sizeof(int) *width)))
+			return;
+		j++;
 	}
+	j = 0;
 	i = 0;
 	fd = open("map1.cub", O_RDONLY);
-	free(line);
 	while(get_next_line(&line, fd) >0)
 	{	
 		if(line[0] >= '0' && line[0] <= '9')
 		{
-			map[i] = line;
-			i++;
+			while(line[i])
+			{
+				map[j][i] = line[i] - '0';
+				i++;
+			}
+			i = 0;
+			j++;
 		}
 	}
 	if(line[0] >= '0' && line[0] <= '9')
 	{
-		map[i] = line;
+		while(line[i])
+		{
+			map[j][i] = line[i] - '0';
+			i++;
+		}
 	}
 	i = 0;
-	/*while(i < height)
+	j = 0;
+	cub->map = map;
+	/*while(j < height)
 	{
-		printf("%s\n", map[i]);
-		i++;
+		while(i < width)
+		{
+			printf("%d", cub->map[j][i]);
+			i++;
+		}
+		i = 0;
+		j++;
+		printf("\n");
 	}*/
 	free(line);
 	fd = open("map1.cub", O_RDONLY);
@@ -258,16 +259,16 @@ int main()
 		{
 			while(line[i])
 			{
-				if(screenwidth == 0)
+				if(cub->screenwidth == 0)
 					while (line[i]>= '0' && line[i] <= '9')
 					{
-						screenwidth = screenwidth * 10 + (line[i] - '0');
+						cub->screenwidth = cub->screenwidth * 10 + (line[i] - '0');
 						i++;
 					}
-				else if(screenheight == 0)
+				else if(cub->screenheight == 0)
 					while (line[i]>= '0' && line[i] <= '9')
 					{
-						screenheight = screenheight * 10 + (line[i] - '0');
+						cub->screenheight = cub->screenheight * 10 + (line[i] - '0');
 						i++;
 					}
 				i++;
@@ -279,11 +280,11 @@ int main()
 			i = 3;
 			while(line[i])
 			{
-				path_no[j] = line[i];
+				cub->path_no[j] = line[i];
 				i++;
 				j++;
 			}
-			path_no[j] = '\0';
+			cub->path_no[j] = '\0';
 			i = 0;
 			j = 0;
 		}
@@ -292,11 +293,11 @@ int main()
 			i = 3;
 			while(line[i])
 			{
-				path_so[j] = line[i];
+				cub->path_so[j] = line[i];
 				i++;
 				j++;
 			}
-			path_so[j] = '\0';
+			cub->path_so[j] = '\0';
 			i = 0;
 			j = 0;
 		}
@@ -305,11 +306,11 @@ int main()
 			i = 3;
 			while(line[i])
 			{
-				path_we[j] = line[i];
+				cub->path_we[j] = line[i];
 				i++;
 				j++;
 			}
-			path_we[j] = '\0';
+			cub->path_we[j] = '\0';
 			i = 0;
 			j = 0;
 		}
@@ -318,11 +319,11 @@ int main()
 			i = 3;
 			while(line[i])
 			{
-				path_ea[j] = line[i];
+				cub->path_ea[j] = line[i];
 				i++;
 				j++;
 			}
-			path_ea[j] = '\0';
+			cub->path_ea[j] = '\0';
 			i = 0;
 			j = 0;
 		}
@@ -331,11 +332,11 @@ int main()
 			i = 2;
 			while(line[i])
 			{
-				path_sprite[j] = line[i];
+				cub->path_sprite[j] = line[i];
 				i++;
 				j++;
 			}
-			path_sprite[j] = '\0';
+			cub->path_sprite[j] = '\0';
 			i = 0;
 			j = 0;
 		}
@@ -344,11 +345,11 @@ int main()
 			i = 2;
 			while (line[i])
 			{
-				floor[j] = line[i];
+				cub->floor_color[j] = line[i];
 				j++;
 				i++;
 			}
-			floor[j] = '\0';
+			cub->floor_color[j] = '\0';
 			j = 0;
 			i = 0;
 		}
@@ -357,20 +358,21 @@ int main()
 			i = 2;
 			while (line[i])
 			{
-				ceiling[j] = line[i];
+				cub->ceiling_color[j] = line[i];
 				j++;
 				i++;
 			}
-			ceiling[j] = '\0';
+			cub->ceiling_color[j] = '\0';
 			j = 0;
 			i = 0;
 		}
 	}
-	printf("Esto es pathno %s\n Esto es pathso %s\n Esto es pathwe %s\n Esto es pathea %s\n Esto es pathsp %s\n", path_no, path_so, path_we, path_ea, path_sprite);
-	free(path_no);
-	free(path_so);
-	free(path_we);
-	free(path_ea);
-	free(path_sprite);
-	free(map);
 }
+/*int main()
+{
+	t_cub *cub;
+	
+	if (!(cub = malloc(sizeof(t_cub))))
+		return (0);
+	ft_read_map(cub);
+}*/

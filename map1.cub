@@ -1,20 +1,20 @@
 R 1920 1080
-NO ./path_to_the_north_texture
-SO ./path_to_the_south_texture
-WE ./path_to_the_west_texture
-EA ./path_to_the_east_texture
+NO ./bluestone.xpm
+SO ./new.xpm
+WE ./grito.xpm
+EA ./night.xpm
 S ./path_to_the_sprite_texture
 F 220,100,0
 C 225,30,0
 111111111111
 100011000001
-101100210001
+100000000001
 100100010001
-100001110001
-111111010001
+100000000001
+100000010001
 111111010001
 110011010001
 100011010001
 100011010001
-110011110N01
+110022220011
 111111111111
