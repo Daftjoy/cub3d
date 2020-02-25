@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/25 16:11:46 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/25 19:09:50 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	ft_floor_ceiling(t_cub *cub)
 			cub->ty = (int)(textheight * (cub->floory - cub->celly)) & (textheight - 1);
 			cub->floorx += cub->floorstepx;
 			cub->floory += cub->floorstepy;
-			cub->img_info[(y * cub->screenwidth + x)]= cub->texture[6][textheight * cub->tx + cub->ty];
+			cub->img_info[y * cub->screenwidth + x]= cub->texture[6][textheight * cub->tx + cub->ty];
 			//cub->img_info[ y * * cub->screenwidth) - 1 + x]= cub->texture[3][textheight * cub->tx + cub->ty];
 			x++;
 		}
@@ -120,10 +120,14 @@ void	ft_view(t_cub *cub)
 	int	x;
 	int	y;
 	int	z;
+	double temp;
 
 	x = 0;
 	y = 0;
 	z = 0;
+	temp = 0;
+	if (!(cub->zBuffer = malloc(sizeof(int) * cub->screenwidth)))
+		return ;
 	cub->img_ptr = mlx_new_image(cub->mlx_ptr,cub->screenwidth, cub->screenheight);
 	cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr, &cub->bpp, &cub->ls, &cub->endian);
 	ft_floor_ceiling(cub);
@@ -227,8 +231,79 @@ void	ft_view(t_cub *cub)
 			z++;
 		}*/
 		z = 0;
+		cub->zBuffer[x] = cub->perpwalldist;
 		x++;
-	}	
+	}
+	x = 0;
+	if (!(cub->spritex = malloc(sizeof(int) * 4)))
+		return ;
+	if (!(cub->spritey = malloc(sizeof(int) * 4)))
+		return ;
+	if (!(cub->spriteorder = malloc(sizeof(int) * 4)))
+		return ;
+	if (!(cub->spritedistance = malloc(sizeof(int) * 4)))
+		return ;	
+	while (x < 4)
+	{
+		cub->spriteorder[x] = x;
+		cub->spritedistance[x] = ((cub->posx - cub->spritex[x]) * (cub->posx - cub->spritex[x]) + (cub->posy - cub->spritey[x]) * (cub->posy - cub->spritey[x]));
+		x++;
+	}
+	x = 0;
+	while (x < 3)
+	{
+		if (cub->spritedistance[x] < cub->spritedistance[x+1])
+		{
+			temp = cub->spriteorder[x];
+			cub->spritedistance[x] = cub->spritedistance[x + 1];
+			cub->spritedistance[x + 1] = temp;
+			x = 0;
+		}
+		else
+			x++;
+	}
+	x = 0;
+	while (x < 4)
+	{
+		cub->spriteposx = cub->spritex[cub->spriteorder[x]] - cub->posx;
+		cub->spriteposy = cub->spritey[cub->spriteorder[x]] - cub->posy;
+		cub->invdet = 1.0 / (cub->planex * cub->diry - cub->dirx * cub->planey);
+		cub->transformx = cub->invdet * (cub->diry * cub->spriteposx - cub->dirx * cub->spriteposy);
+		cub->transformy = cub->invdet * (-cub->planey * cub->spriteposx + cub->planex * cub->spriteposy);
+		cub->spritescreenx = (int)(cub->screenwidth/2 * (1 + cub->transformx / cub->transformy));
+		cub->spriteheight = fabs((int)cub->screenheight / cub->transformy);
+		cub->drawstarty = -cub->spriteheight / 2 + cub->screenheight / 2;
+		if (cub->drawstarty < 0)
+			cub->drawstarty = 0;
+		cub->drawendy = cub->spriteheight / 2 + cub->screenheight / 2;
+		if (cub->drawendy >= cub->screenheight)
+			cub->drawendy = cub->screenheight - 1;
+		cub->spritewidth = fabs((int)cub->screenheight / cub->transformy);
+		cub->drawstartx = -cub->spritewidth / 2 + cub->spritescreenx;
+		if (cub->drawstartx < 0)
+			cub->drawstartx = 0;
+		cub->drawendx = cub->spritewidth / 2 + cub->spritescreenx;
+		if (cub->drawendx >= cub->screenwidth)
+			cub->drawendx = cub->screenwidth - 1;
+		int stripe = cub->drawstartx;
+		while (stripe < cub->drawendx)
+		{
+			//int texx = (int)(256 * (stripe - (-cub->spritewidth / 2 + cub->spritescreenx)) * textwidth / cub->spritewidth) / 256;
+			if (cub->transformy > 0 && stripe > 0 && stripe < cub->screenwidth && cub->transformy < cub->zBuffer[stripe])
+			{
+				int y = cub->drawstarty;
+				while (y < cub->drawendy)
+				{
+					//int d = (y) * 256 - cub->screenheight * 128 + cub->spriteheight * 128;
+					//int texy = ((d * textheight) / cub->spriteheight) / 256;
+					//cub->img_info[y * cub->screenwidth + stripe] = cub->texture[6][textwidth * texy + texx];
+					y++;
+				}
+			}
+			stripe++;
+		}	
+		x++;
+	}
 	mlx_put_image_to_window(cub->mlx_ptr, cub->win_ptr, cub->img_ptr, 0, 0);
 	mlx_destroy_image(cub->mlx_ptr, cub->img_ptr);
 }

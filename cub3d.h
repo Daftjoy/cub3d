@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/21 12:05:59 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/24 19:40:08 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/25 18:21:44 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,24 @@ typedef struct 	s_cub
 	int		celly;
 	int		tx;
 	int		ty;
+	double	*zBuffer;
+	double	*spritex;
+	double	*spritey;
+	double	spriteposx;
+	double	spriteposy;
+	int		*spriteorder;
+	double	*spritedistance;
+	double	invdet;
+	double	transformx;
+	double	transformy;
+	int		spritescreenx;
+	int		spriteheight;
+	int		drawstarty;
+	int		drawendy;
+	int		spritewidth;
+	int		drawstartx;
+	int		drawendx;
+	
 } 				t_cub;
 
 
