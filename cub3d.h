@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/21 12:05:59 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/21 16:29:21 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/24 19:40:08 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,23 @@ typedef struct 	s_cub
 	char	*path_sprite;
 	char	*floor_color;
 	char 	*ceiling_color;
+	float	raydirx0;
+	float	raydiry0;
+	float	raydirx1;
+	float	raydiry1;
+	int		p;
+	float	posz;
+	float	rowdistance;
+	float	floorstepx;
+	float	floorstepy;
+	float	floorx;
+	float	floory;
+	int		cellx;
+	int		celly;
+	int		tx;
+	int		ty;
 } 				t_cub;
+
 
 void ft_read_map(t_cub *cub, char *map_path);
 

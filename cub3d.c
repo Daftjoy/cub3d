@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/21 19:03:20 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/25 16:11:46 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,47 @@ int		ft_music(void)
 	return (0);
 }
 
+void	ft_floor_ceiling(t_cub *cub)
+{
+	int		y;
+	int		x;
+	//void	*img_ptr;
+	//int		*img_info;
+
+	y = 0;
+	//cub->img_ptr = mlx_new_image(cub->mlx_ptr, cub->screenwidth, cub->screenheight);
+	//cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr, &cub->bpp, &cub->ls, &cub->endian);	
+	while(y < cub->screenheight)
+	{
+		cub->raydirx0 = cub->dirx - cub->planex;
+		cub->raydiry0 = cub->diry - cub->planey;
+		cub->raydirx1 = cub->dirx + cub->planex;
+		cub->raydiry1 = cub->diry + cub->planey;
+		cub->p = y - cub->screenheight / 2;
+		cub->posz = 0.5 * cub->screenheight;
+		cub->rowdistance = cub->posz / cub->p;
+		cub->floorstepx = cub->rowdistance * (cub->raydirx1 - cub->raydirx0) / cub->screenwidth;
+		cub->floorstepy = cub->rowdistance * (cub->raydiry1 - cub->raydiry0) / cub->screenwidth;
+		cub->floorx = cub->posx + cub->rowdistance * cub->raydirx0;
+		cub->floory = cub->posy + cub->rowdistance * cub->raydiry0;
+		x = 0;
+		while (x < cub->screenwidth)
+		{
+			cub->cellx = (int)cub->floorx;
+			cub->celly = (int)cub->floory;
+			cub->tx = (int)(textwidth * (cub->floorx - cub->cellx)) & (textwidth - 1);
+			cub->ty = (int)(textheight * (cub->floory - cub->celly)) & (textheight - 1);
+			cub->floorx += cub->floorstepx;
+			cub->floory += cub->floorstepy;
+			cub->img_info[(y * cub->screenwidth + x)]= cub->texture[6][textheight * cub->tx + cub->ty];
+			//cub->img_info[ y * * cub->screenwidth) - 1 + x]= cub->texture[3][textheight * cub->tx + cub->ty];
+			x++;
+		}
+		y++;
+	}
+	//mlx_put_image_to_window(cub->mlx_ptr, cub->win_ptr, cub->img_ptr, 0, 0);
+	//mlx_destroy_image(cub->mlx_ptr, cub->img_ptr);
+}
 
 void	ft_textures(t_cub *cub)
 {
@@ -85,6 +126,7 @@ void	ft_view(t_cub *cub)
 	z = 0;
 	cub->img_ptr = mlx_new_image(cub->mlx_ptr,cub->screenwidth, cub->screenheight);
 	cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr, &cub->bpp, &cub->ls, &cub->endian);
+	ft_floor_ceiling(cub);
 	while (x <cub->screenwidth)
 	{
 		cub->camerax = 2 * x / (double)cub->screenwidth - 1;
@@ -146,7 +188,6 @@ void	ft_view(t_cub *cub)
 		if (cub->drawend >= cub->screenheight)
 			cub->drawend = cub->screenheight -1;
 		y = cub->drawstart;
-		//int texnum = cub->map[cub->mapx][cub->mapy] - 1;
 		double	wallx;
 		if (cub->side == 0)
 			wallx = cub->posy + cub->perpwalldist * cub->raydiry;
@@ -173,23 +214,21 @@ void	ft_view(t_cub *cub)
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[2][textheight * texy + texx];
 			else if(cub->side == 1 && cub->mapy < cub->posy)
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[3][textheight * texy + texx];
-			//if(cub->side == 1 && cub->mapx < cub->posx)
-				//cub->img_info[y *cub->screenwidth + x] = cub->texture[0][textheight * texy + texx];
 			else if(cub->side == 0 && cub->mapx > cub->posx)
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[0][textheight * texy + texx];
 			else
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[1][textheight * texy + texx];
 			y++;
 		}
-		z = cub->drawend;
+		/*z = cub->drawend;
 		while(z < cub->screenheight)
 		{
 			cub->img_info[z *cub->screenwidth + x] = 0x926521;
 			z++;
-		}
+		}*/
 		z = 0;
 		x++;
-	}
+	}	
 	mlx_put_image_to_window(cub->mlx_ptr, cub->win_ptr, cub->img_ptr, 0, 0);
 	mlx_destroy_image(cub->mlx_ptr, cub->img_ptr);
 }
@@ -327,6 +366,7 @@ int main(int argc, char **argv)
 		cub->movespeed = 0.1;
 		system("afplay rec.mp3 &");
 		ft_textures(cub);
+		//ft_floor_ceiling(cub);
 		ft_view(cub);
 		mlx_hook(cub->win_ptr, 2, 0, key_pressed, (void *)cub);
 		mlx_hook(cub->win_ptr, 3, 0, key_released, (void *)cub);
