@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/26 17:51:25 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/26 21:32:46 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,8 @@ void	ft_floor_ceiling(t_cub *cub)
 {
 	int		y;
 	int		x;
-	//void	*img_ptr;
-	//int		*img_info;
-
 	y = 0;
-	//cub->img_ptr = mlx_new_image(cub->mlx_ptr, cub->screenwidth, cub->screenheight);
-	//cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr, &cub->bpp, &cub->ls, &cub->endian);	
+		
 	while(y < cub->screenheight)
 	{
 		cub->raydirx0 = cub->dirx - cub->planex;
@@ -51,7 +47,7 @@ void	ft_floor_ceiling(t_cub *cub)
 			cub->floorx += cub->floorstepx;
 			cub->floory += cub->floorstepy;
 			cub->img_info[y * cub->screenwidth + x]= cub->texture[6][textheight * cub->tx + cub->ty];
-			//cub->img_info[ y * * cub->screenwidth) - 1 + x]= cub->texture[3][textheight * cub->tx + cub->ty];
+			//cub->img_info[ y * cub->screenwidth) - 1 + x]= cub->texture[3][textheight * cub->tx + cub->ty];
 			x++;
 		}
 		y++;
@@ -73,6 +69,8 @@ void	ft_textures(t_cub *cub)
 	int 	*n_text_info4;
 	int		*n_text5;
 	int 	*n_text_info5;
+	int		*n_text6;
+	int 	*n_text_info6;
 	
 	i = 0;
 	x = 0;
@@ -87,10 +85,12 @@ void	ft_textures(t_cub *cub)
 	n_text_info3 = (int *)mlx_get_data_addr(n_text3, &cub->bpp, &cub->ls, &cub->endian);
 	n_text4 = mlx_xpm_file_to_image(cub->mlx_ptr, cub->path_ea, &width, &height);
 	n_text_info4 = (int *)mlx_get_data_addr(n_text4, &cub->bpp, &cub->ls, &cub->endian);
-	n_text5 = mlx_xpm_file_to_image(cub->mlx_ptr, "barrel.xpm", &width, &height);
+	n_text5 = mlx_xpm_file_to_image(cub->mlx_ptr, cub->path_sprite, &width, &height);
 	n_text_info5 = (int *)mlx_get_data_addr(n_text5, &cub->bpp, &cub->ls, &cub->endian);
+	n_text6 = mlx_xpm_file_to_image(cub->mlx_ptr, "floor.xpm", &width, &height);
+	n_text_info6 = (int *)mlx_get_data_addr(n_text6, &cub->bpp, &cub->ls, &cub->endian);
 	cub->texture = malloc(sizeof(int *) * 8);
-	while(i < 8)
+	while(i < 7)
 	{
 		cub->texture[i] = malloc(sizeof(int)* textwidth * textheight);
 		i++;
@@ -100,19 +100,13 @@ void	ft_textures(t_cub *cub)
 		y = 0;
 		while (y < textheight)
 		{
-			
-			//int xorcolor = (x * 256 / textwidth) ^ (y * 256 / textheight); Texturas tutorial
-			//int ycolor = y * 256 / textheight;							Texturas tutorial
-			//int xycolor = y * 128 / textheight + x * 128 / textwidth;		Texturas tutorial
-			//Toda esta verga es para poner nuestras texturas, si descomentas pasa a lo de antes
-			cub->texture[0] = cub->n_text_info; //65536 * 254 * (x != y && x != textwidth - y); //flat red texture with black cross			
-    		cub->texture[1] = cub->n_text_info2; //xycolor + 256 * xycolor + 65536 * xycolor; //sloped greyscale
-    		cub->texture[2] = n_text_info3; //256 * xycolor + 65536 * xycolor; //sloped yellow gradient
-    		cub->texture[3] = n_text_info4;//xorcolor + 256 * xorcolor + 65536 * xorcolor; //xor greyscale
-    		cub->texture[4] = n_text_info5;//256 * xorcolor; //xor green
-    		cub->texture[5] = cub->n_text_info;//65536 * 192 * (x % 16 && y % 16); //red bricks
-    		cub->texture[6] = cub->n_text_info2;//65536 * ycolor; //red gradient
-    		cub->texture[7] = cub->n_text_info;//128 + 256 * 128 + 65536 * 128; //flat grey texture
+			cub->texture[0] = cub->n_text_info; //SO
+    		cub->texture[1] = cub->n_text_info2; //NO
+    		cub->texture[2] = n_text_info3; //WE
+    		cub->texture[3] = n_text_info4;//EA
+    		cub->texture[4] = n_text_info5;//SPRITE
+    		cub->texture[5] = cub->n_text_info;//SKY
+    		cub->texture[6] = n_text_info6;//FLOOR
 			y++;
 		}
 		x++;
@@ -219,7 +213,7 @@ void	ft_view(t_cub *cub)
 			int texy = (int)texpos & (textheight - 1);
 			texpos +=step;
 			if(cub->side == 1 && cub->mapy > cub->posy)
-				cub->img_info[y *cub->screenwidth + x] = 0x926521;//cub->texture[2][textheight * texy + texx];
+				cub->img_info[y *cub->screenwidth + x] = cub->texture[2][textheight * texy + texx];
 			else if(cub->side == 1 && cub->mapy < cub->posy)
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[3][textheight * texy + texx];
 			else if(cub->side == 0 && cub->mapx > cub->posx)
@@ -312,7 +306,7 @@ void	ft_view(t_cub *cub)
 					int d = (y) * 256 - cub->screenheight * 128 + cub->spriteheight * 128;
 					int texy = ((d * textheight) / cub->spriteheight) / 256;
 					if (cub->texture[4][textwidth * texy + texx] != 0)
-						cub->img_info[y * cub->screenwidth + stripe] =  cub->texture[4][textwidth * texy + texx]; //cub->texture[6][textwidth * texy + texx];
+						cub->img_info[y * cub->screenwidth + stripe] =  cub->texture[4][textwidth * texy + texx];
 					y++;
 				}
 			}
