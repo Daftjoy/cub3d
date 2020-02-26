@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:57:51 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/26 16:42:31 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/26 23:17:48 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,7 @@ void ft_read_map(t_cub *cub, char *map_path)
 	int **map;
 	int i;
 	int j;
+	int n;
 	int height;
 	int width;
 	
@@ -184,6 +185,7 @@ void ft_read_map(t_cub *cub, char *map_path)
 	cub->screenwidth = 0;
 	i = 0;
 	j = 0;
+	cub->sprites_numb = 0;
 	height = 0;
 	width = 0;
 	cub->path_no = malloc(sizeof(char) * 100);
@@ -193,16 +195,34 @@ void ft_read_map(t_cub *cub, char *map_path)
 	cub->path_sprite = malloc(sizeof(char) * 100);
 	cub->floor_color = malloc(sizeof(char) * 100);
 	cub->ceiling_color = malloc(sizeof(char) * 100);
-	i = 0;
 	line = NULL;
 	fd = open(map_path, O_RDONLY);
 	while(get_next_line(&line, fd) > 0)
 	{	
 		if(line[0] >= '0' && line[0] <= '9')
+		{
+			i = 0;
+			while(line[i])
+			{
+				if (line[i] == '2')
+					cub->sprites_numb++;
+				i++;
+			}
 			height++;
+		}
 	}
 	if(line[0] >= '0' && line[0] <= '9')
+	{
+		i = 0;
+		while(line[i])
+		{
+			if (line[i] == '2')
+				cub->sprites_numb++;
+			i++;
+		}
 		height++;
+	}
+	i = 0;
 	width = ft_strlen(line);
 	free(line);
 	line = NULL;
@@ -214,8 +234,13 @@ void ft_read_map(t_cub *cub, char *map_path)
 			return;
 		j++;
 	}
+	if(!(cub->spritex = malloc(sizeof(double) * cub->sprites_numb)))
+		return ;
+	if(!(cub->spritey = malloc(sizeof(double) * cub->sprites_numb)))
+		return ;
 	j = 0;
 	i = 0;
+	n = 0;
 	fd = open(map_path, O_RDONLY);
 	while(get_next_line(&line, fd) > 0)
 	{	
@@ -223,8 +248,24 @@ void ft_read_map(t_cub *cub, char *map_path)
 		{
 			while(line[i])
 			{
-				map[j][i] = line[i] - '0';
-				i++;
+				if (line[i] == '2')
+				{
+					cub->spritex[n] = i;
+					cub->spritey[n] = j;
+					n++;
+				}
+				if (line[i] == 'W' || line[i] == 'N' || line[i] == 'S' || line[i] == 'E')
+				{
+					cub->posx = j;
+					cub->posy = i;
+					map[j][i] = '0';
+					i++;
+				}
+				else
+				{
+					map[j][i] = line[i] - '0';
+					i++;
+				}
 			}
 			i = 0;
 			j++;
@@ -234,6 +275,12 @@ void ft_read_map(t_cub *cub, char *map_path)
 	{
 		while(line[i])
 		{
+			if (line[i] == '2')
+			{
+				cub->spritex[n] = i;
+				cub->spritey[n] = j;
+				n++;
+			}
 			map[j][i] = line[i] - '0';
 			i++;
 		}
@@ -271,12 +318,17 @@ void ft_read_map(t_cub *cub, char *map_path)
 		}
 		if(line[0] == 'N' && line[1] == 'O')
 		{
-			i = 3;
+			i = 2;
 			while(line[i])
 			{
-				cub->path_no[j] = line[i];
-				i++;
-				j++;
+				if(line[i] == ' ')
+					i++;
+				else
+				{
+					cub->path_no[j] = line[i];
+					i++;
+					j++;
+				}
 			}
 			cub->path_no[j] = '\0';
 			i = 0;
@@ -287,9 +339,14 @@ void ft_read_map(t_cub *cub, char *map_path)
 			i = 3;
 			while(line[i])
 			{
-				cub->path_so[j] = line[i];
-				i++;
-				j++;
+				if(line[i] == ' ')
+					i++;
+				else
+				{
+					cub->path_so[j] = line[i];
+					i++;
+					j++;
+				}
 			}
 			cub->path_so[j] = '\0';
 			i = 0;
@@ -300,9 +357,14 @@ void ft_read_map(t_cub *cub, char *map_path)
 			i = 3;
 			while(line[i])
 			{
-				cub->path_we[j] = line[i];
-				i++;
-				j++;
+				if(line[i] == ' ')
+					i++;
+				else
+				{
+					cub->path_we[j] = line[i];
+					i++;
+					j++;
+				}
 			}
 			cub->path_we[j] = '\0';
 			i = 0;
@@ -313,9 +375,14 @@ void ft_read_map(t_cub *cub, char *map_path)
 			i = 3;
 			while(line[i])
 			{
-				cub->path_ea[j] = line[i];
-				i++;
-				j++;
+				if(line[i] == ' ')
+					i++;
+				else
+				{
+					cub->path_ea[j] = line[i];
+					i++;
+					j++;
+				}
 			}
 			cub->path_ea[j] = '\0';
 			i = 0;
@@ -326,9 +393,14 @@ void ft_read_map(t_cub *cub, char *map_path)
 			i = 2;
 			while(line[i])
 			{
-				cub->path_sprite[j] = line[i];
-				i++;
-				j++;
+				if(line[i] == ' ')
+					i++;
+				else
+				{
+					cub->path_sprite[j] = line[i];
+					i++;
+					j++;
+				}
 			}
 			cub->path_sprite[j] = '\0';
 			i = 0;
@@ -339,9 +411,14 @@ void ft_read_map(t_cub *cub, char *map_path)
 			i = 2;
 			while (line[i])
 			{
-				cub->floor_color[j] = line[i];
-				j++;
-				i++;
+				if(line[i] == ' ')
+					i++;
+				else
+				{
+					cub->floor_color[j] = line[i];
+					j++;
+					i++;
+				}
 			}
 			cub->floor_color[j] = '\0';
 			j = 0;
@@ -352,9 +429,14 @@ void ft_read_map(t_cub *cub, char *map_path)
 			i = 2;
 			while (line[i])
 			{
-				cub->ceiling_color[j] = line[i];
-				j++;
-				i++;
+				if (line[i] == ' ')
+					i++;
+				else
+				{
+					cub->ceiling_color[j] = line[i];
+					j++;
+					i++;
+				}
 			}
 			cub->ceiling_color[j] = '\0';
 			j = 0;
@@ -362,11 +444,3 @@ void ft_read_map(t_cub *cub, char *map_path)
 		}
 	}
 }
-/*int main()
-{
-	t_cub *cub;
-	
-	if (!(cub = malloc(sizeof(t_cub))))
-		return (0);
-	ft_read_map(cub);
-}*/

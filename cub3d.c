@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/26 21:32:46 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/26 23:23:27 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,13 +47,11 @@ void	ft_floor_ceiling(t_cub *cub)
 			cub->floorx += cub->floorstepx;
 			cub->floory += cub->floorstepy;
 			cub->img_info[y * cub->screenwidth + x]= cub->texture[6][textheight * cub->tx + cub->ty];
-			//cub->img_info[ y * cub->screenwidth) - 1 + x]= cub->texture[3][textheight * cub->tx + cub->ty];
+			//cub->img_info[(y * cub->screenwidth -1) + x]= cub->texture[5][textheight * cub->tx + cub->ty];
 			x++;
 		}
 		y++;
 	}
-	//mlx_put_image_to_window(cub->mlx_ptr, cub->win_ptr, cub->img_ptr, 0, 0);
-	//mlx_destroy_image(cub->mlx_ptr, cub->img_ptr);
 }
 
 void	ft_textures(t_cub *cub)
@@ -175,7 +173,7 @@ void	ft_view(t_cub *cub)
 				cub->mapy += cub->stepy;
 				cub->side = 1;
 			}
-			if (cub->map[cub->mapx][cub->mapy] > 0)
+			if (cub->map[cub->mapx][cub->mapy] == 1)
 				cub->hit = 1;
 		}
 		if (cub->side == 0)
@@ -202,7 +200,7 @@ void	ft_view(t_cub *cub)
 		if (cub->side == 1 && cub->raydiry < 0)
 			texx = textwidth - texx -1;
 		double step = 1.0 * textheight / cub->lineheight;
-		double texpos = (cub->drawstart - cub->screenheight / 2 + cub->lineheight / 2) * step; // con 0 debería funcionar igual
+		double texpos = (cub->drawstart - cub->screenheight / 2 + cub->lineheight / 2) * step;
 		while(z < y)
 		{
 			cub->img_info[z *cub->screenwidth + x] = 0x99FFFF;
@@ -213,50 +211,32 @@ void	ft_view(t_cub *cub)
 			int texy = (int)texpos & (textheight - 1);
 			texpos +=step;
 			if(cub->side == 1 && cub->mapy > cub->posy)
-				cub->img_info[y *cub->screenwidth + x] = cub->texture[2][textheight * texy + texx];
-			else if(cub->side == 1 && cub->mapy < cub->posy)
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[3][textheight * texy + texx];
+			else if(cub->side == 1 && cub->mapy < cub->posy)
+				cub->img_info[y *cub->screenwidth + x] = cub->texture[2][textheight * texy + texx];
 			else if(cub->side == 0 && cub->mapx > cub->posx)
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[0][textheight * texy + texx];
 			else
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[1][textheight * texy + texx];
 			y++;
 		}
-		/*z = cub->drawend;
-		while(z < cub->screenheight)
-		{
-			cub->img_info[z *cub->screenwidth + x] = 0x926521;
-			z++;
-		}*/
 		z = 0;
 		cub->zBuffer[x] = cub->perpwalldist;
 		x++;
 	}
 	x = 0;
-	if (!(cub->spritex = malloc(sizeof(double) * 4)))
+	if (!(cub->spriteorder = malloc(sizeof(double) * cub->sprites_numb)))
 		return ;
-	if (!(cub->spritey = malloc(sizeof(double) * 4)))
+	if (!(cub->spritedistance = malloc(sizeof(double) * cub->sprites_numb)))
 		return ;
-	if (!(cub->spriteorder = malloc(sizeof(double) * 4)))
-		return ;
-	if (!(cub->spritedistance = malloc(sizeof(double) * 4)))
-		return ;
-	cub->spritex[0] = 5;
-	cub->spritey[0] = 5;
-	cub->spritex[1] = 3;
-	cub->spritey[1] = 5;	
-	cub->spritex[2] = 5;
-	cub->spritey[2] = 3;
-	cub->spritex[3] = 3;
-	cub->spritey[3] = 3;
-	while (x < 4)
+	while (x < cub->sprites_numb)
 	{
 		cub->spriteorder[x] = x;
 		cub->spritedistance[x] = ((cub->posx - cub->spritex[x]) * (cub->posx - cub->spritex[x]) + (cub->posy - cub->spritey[x]) * (cub->posy - cub->spritey[x]));
 		x++;
 	}
 	x = 0;
-	while (x < 3)
+	while (x < (cub->sprites_numb - 1))
 	{
 		if (cub->spritedistance[x] < cub->spritedistance[x+1])
 		{
@@ -272,7 +252,7 @@ void	ft_view(t_cub *cub)
 			x++;
 	}
 	x = 0;
-	while (x < 4)
+	while (x < cub->sprites_numb)
 	{
 		cub->spriteposx = cub->spritex[cub->spriteorder[x]] - cub->posx;
 		cub->spriteposy = cub->spritey[cub->spriteorder[x]] - cub->posy;
@@ -334,30 +314,30 @@ int move_player(void *param)
 	cub = (t_cub *)param;
 	if	(cub->w == 1)//W
 	{
-		if (!cub->map[(int)(cub->posx + cub->dirx * cub->movespeed)][(int)cub->posy])
+		if (cub->map[(int)(cub->posx + cub->dirx * cub->movespeed)][(int)cub->posy] != 1)
 			cub->posx += cub->dirx * cub->movespeed;
-		if (!cub->map[(int)cub->posx][(int)(cub->posy + cub->diry * cub->movespeed)])
+		if (cub->map[(int)cub->posx][(int)(cub->posy + cub->diry * cub->movespeed)] != 1)
 			cub->posy += cub->diry * cub->movespeed;
 	}
 	if (cub->s == 1)//S
 	{
-		if (!cub->map[(int)(cub->posx - cub->dirx * cub->movespeed)][(int)cub->posy])
+		if (cub->map[(int)(cub->posx - cub->dirx * cub->movespeed)][(int)cub->posy] != 1)
 			cub->posx -= cub->dirx * cub->movespeed;
-		if (!cub->map[(int)cub->posx][(int)(cub->posy - cub->diry * cub->movespeed)])
+		if (cub->map[(int)cub->posx][(int)(cub->posy - cub->diry * cub->movespeed)] != 1)
 			cub->posy -=cub->diry * cub->movespeed;
 	}
 	if	(cub->d == 1)//D
 	{
-		if (!cub->map[(int)(cub->posx + cub->planex * cub->movespeed)][(int)cub->posy])
+		if (cub->map[(int)(cub->posx + cub->planex * cub->movespeed)][(int)cub->posy] != 1)
 			cub->posx += cub->planex * cub->movespeed;
-		if (!cub->map[(int)cub->posx][(int)(cub->posy + cub->planey * cub->movespeed)])
+		if (cub->map[(int)cub->posx][(int)(cub->posy + cub->planey * cub->movespeed)] != 1)
 			cub->posy += cub->planey * cub->movespeed;
 	}
 	if	(cub->a == 1)//A
 	{
-		if (!cub->map[(int)(cub->posx - cub->planex * cub->movespeed)][(int)cub->posy])
+		if (cub->map[(int)(cub->posx - cub->planex * cub->movespeed)][(int)cub->posy] != 1)
 			cub->posx -= cub->planex * cub->movespeed;
-		if (!cub->map[(int)cub->posx][(int)(cub->posy - cub->planey * cub->movespeed)])
+		if (cub->map[(int)cub->posx][(int)(cub->posy - cub->planey * cub->movespeed)] != 1)
 			cub->posy -= cub->planey * cub->movespeed;
 	}
 	if	(cub->left == 1)
@@ -440,8 +420,6 @@ int main(int argc, char **argv)
 		if (!(cub = malloc(sizeof(t_cub))))
 			return (0);
 		ft_read_map(cub, argv[1]);
-		cub->posx = 2.0;
-		cub->posy = 3.5;
 		cub->dirx = -1.0;
 		cub->diry = 0.0;
 		cub->planex = 0.0;

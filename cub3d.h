@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/21 12:05:59 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/25 18:21:44 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/26 21:56:31 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,7 @@ typedef struct 	s_cub
 	int		spritewidth;
 	int		drawstartx;
 	int		drawendx;
+	int		sprites_numb;
 	
 } 				t_cub;
 
