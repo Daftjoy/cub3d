@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:57:51 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/21 16:29:32 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/26 16:42:31 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,7 +196,7 @@ void ft_read_map(t_cub *cub, char *map_path)
 	i = 0;
 	line = NULL;
 	fd = open(map_path, O_RDONLY);
-	while(get_next_line(&line, fd) >0)
+	while(get_next_line(&line, fd) > 0)
 	{	
 		if(line[0] >= '0' && line[0] <= '9')
 			height++;
@@ -205,18 +205,19 @@ void ft_read_map(t_cub *cub, char *map_path)
 		height++;
 	width = ft_strlen(line);
 	free(line);
-	if(!(map = malloc(sizeof(int *) *height)))
-		return;
+	line = NULL;
+	if(!(map = malloc(sizeof(int *) * height)))
+		return ;
 	while (j < height)
 	{
-		if(!(map[j] = malloc(sizeof(int) *width)))
+		if(!(map[j] = malloc(sizeof(int) * width)))
 			return;
 		j++;
 	}
 	j = 0;
 	i = 0;
-	fd = open("map1.cub", O_RDONLY);
-	while(get_next_line(&line, fd) >0)
+	fd = open(map_path, O_RDONLY);
+	while(get_next_line(&line, fd) > 0)
 	{	
 		if(line[0] >= '0' && line[0] <= '9')
 		{
@@ -240,19 +241,11 @@ void ft_read_map(t_cub *cub, char *map_path)
 	i = 0;
 	j = 0;
 	cub->map = map;
-	/*while(j < height)
-	{
-		while(i < width)
-		{
-			printf("%d", cub->map[j][i]);
-			i++;
-		}
-		i = 0;
-		j++;
-		printf("\n");
-	}*/
 	free(line);
-	fd = open("map1.cub", O_RDONLY);
+	line = NULL;
+	fd = open(map_path, O_RDONLY);
+	//char *line;
+	//line = NULL;
 	while(get_next_line(&line, fd) >0)
 	{
 		if(line[0] == 'R')
@@ -271,7 +264,8 @@ void ft_read_map(t_cub *cub, char *map_path)
 						cub->screenheight = cub->screenheight * 10 + (line[i] - '0');
 						i++;
 					}
-				i++;
+				if (line[i])
+					i++;
 			}
 			i = 0;
 		}

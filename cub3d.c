@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/25 19:09:50 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/26 17:51:25 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ void	ft_textures(t_cub *cub)
 	int 	*n_text_info3;
 	int		*n_text4;
 	int 	*n_text_info4;
+	int		*n_text5;
+	int 	*n_text_info5;
 	
 	i = 0;
 	x = 0;
@@ -85,6 +87,8 @@ void	ft_textures(t_cub *cub)
 	n_text_info3 = (int *)mlx_get_data_addr(n_text3, &cub->bpp, &cub->ls, &cub->endian);
 	n_text4 = mlx_xpm_file_to_image(cub->mlx_ptr, cub->path_ea, &width, &height);
 	n_text_info4 = (int *)mlx_get_data_addr(n_text4, &cub->bpp, &cub->ls, &cub->endian);
+	n_text5 = mlx_xpm_file_to_image(cub->mlx_ptr, "barrel.xpm", &width, &height);
+	n_text_info5 = (int *)mlx_get_data_addr(n_text5, &cub->bpp, &cub->ls, &cub->endian);
 	cub->texture = malloc(sizeof(int *) * 8);
 	while(i < 8)
 	{
@@ -105,7 +109,7 @@ void	ft_textures(t_cub *cub)
     		cub->texture[1] = cub->n_text_info2; //xycolor + 256 * xycolor + 65536 * xycolor; //sloped greyscale
     		cub->texture[2] = n_text_info3; //256 * xycolor + 65536 * xycolor; //sloped yellow gradient
     		cub->texture[3] = n_text_info4;//xorcolor + 256 * xorcolor + 65536 * xorcolor; //xor greyscale
-    		cub->texture[4] = cub->n_text_info2;//256 * xorcolor; //xor green
+    		cub->texture[4] = n_text_info5;//256 * xorcolor; //xor green
     		cub->texture[5] = cub->n_text_info;//65536 * 192 * (x % 16 && y % 16); //red bricks
     		cub->texture[6] = cub->n_text_info2;//65536 * ycolor; //red gradient
     		cub->texture[7] = cub->n_text_info;//128 + 256 * 128 + 65536 * 128; //flat grey texture
@@ -126,7 +130,7 @@ void	ft_view(t_cub *cub)
 	y = 0;
 	z = 0;
 	temp = 0;
-	if (!(cub->zBuffer = malloc(sizeof(int) * cub->screenwidth)))
+	if (!(cub->zBuffer = malloc(sizeof(double) * cub->screenwidth + 1)))
 		return ;
 	cub->img_ptr = mlx_new_image(cub->mlx_ptr,cub->screenwidth, cub->screenheight);
 	cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr, &cub->bpp, &cub->ls, &cub->endian);
@@ -215,7 +219,7 @@ void	ft_view(t_cub *cub)
 			int texy = (int)texpos & (textheight - 1);
 			texpos +=step;
 			if(cub->side == 1 && cub->mapy > cub->posy)
-				cub->img_info[y *cub->screenwidth + x] = cub->texture[2][textheight * texy + texx];
+				cub->img_info[y *cub->screenwidth + x] = 0x926521;//cub->texture[2][textheight * texy + texx];
 			else if(cub->side == 1 && cub->mapy < cub->posy)
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[3][textheight * texy + texx];
 			else if(cub->side == 0 && cub->mapx > cub->posx)
@@ -235,14 +239,22 @@ void	ft_view(t_cub *cub)
 		x++;
 	}
 	x = 0;
-	if (!(cub->spritex = malloc(sizeof(int) * 4)))
+	if (!(cub->spritex = malloc(sizeof(double) * 4)))
 		return ;
-	if (!(cub->spritey = malloc(sizeof(int) * 4)))
+	if (!(cub->spritey = malloc(sizeof(double) * 4)))
 		return ;
-	if (!(cub->spriteorder = malloc(sizeof(int) * 4)))
+	if (!(cub->spriteorder = malloc(sizeof(double) * 4)))
 		return ;
-	if (!(cub->spritedistance = malloc(sizeof(int) * 4)))
-		return ;	
+	if (!(cub->spritedistance = malloc(sizeof(double) * 4)))
+		return ;
+	cub->spritex[0] = 5;
+	cub->spritey[0] = 5;
+	cub->spritex[1] = 3;
+	cub->spritey[1] = 5;	
+	cub->spritex[2] = 5;
+	cub->spritey[2] = 3;
+	cub->spritex[3] = 3;
+	cub->spritey[3] = 3;
 	while (x < 4)
 	{
 		cub->spriteorder[x] = x;
@@ -255,6 +267,9 @@ void	ft_view(t_cub *cub)
 		if (cub->spritedistance[x] < cub->spritedistance[x+1])
 		{
 			temp = cub->spriteorder[x];
+			cub->spriteorder[x] = cub->spriteorder[x + 1];
+			cub->spriteorder[x + 1] = temp;
+			temp = cub->spritedistance[x];
 			cub->spritedistance[x] = cub->spritedistance[x + 1];
 			cub->spritedistance[x + 1] = temp;
 			x = 0;
@@ -288,15 +303,16 @@ void	ft_view(t_cub *cub)
 		int stripe = cub->drawstartx;
 		while (stripe < cub->drawendx)
 		{
-			//int texx = (int)(256 * (stripe - (-cub->spritewidth / 2 + cub->spritescreenx)) * textwidth / cub->spritewidth) / 256;
+			int texx = (int)(256 * (stripe - (-cub->spritewidth / 2 + cub->spritescreenx)) * textwidth / cub->spritewidth) / 256;
 			if (cub->transformy > 0 && stripe > 0 && stripe < cub->screenwidth && cub->transformy < cub->zBuffer[stripe])
 			{
 				int y = cub->drawstarty;
 				while (y < cub->drawendy)
 				{
-					//int d = (y) * 256 - cub->screenheight * 128 + cub->spriteheight * 128;
-					//int texy = ((d * textheight) / cub->spriteheight) / 256;
-					//cub->img_info[y * cub->screenwidth + stripe] = cub->texture[6][textwidth * texy + texx];
+					int d = (y) * 256 - cub->screenheight * 128 + cub->spriteheight * 128;
+					int texy = ((d * textheight) / cub->spriteheight) / 256;
+					if (cub->texture[4][textwidth * texy + texx] != 0)
+						cub->img_info[y * cub->screenwidth + stripe] =  cub->texture[4][textwidth * texy + texx]; //cub->texture[6][textwidth * texy + texx];
 					y++;
 				}
 			}
@@ -313,6 +329,7 @@ int exit_hook(void *param)
 
 	cub = (t_cub *)param;
 	free(cub);
+	system("killall afplay");
 	exit(0);
 	return(0);
 }
@@ -441,7 +458,6 @@ int main(int argc, char **argv)
 		cub->movespeed = 0.1;
 		system("afplay rec.mp3 &");
 		ft_textures(cub);
-		//ft_floor_ceiling(cub);
 		ft_view(cub);
 		mlx_hook(cub->win_ptr, 2, 0, key_pressed, (void *)cub);
 		mlx_hook(cub->win_ptr, 3, 0, key_released, (void *)cub);
