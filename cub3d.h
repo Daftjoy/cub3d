@@ -6,31 +6,34 @@
 /*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/21 12:05:59 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/28 13:37:38 by agianico         ###   ########.fr       */
+/*   Updated: 2020/02/28 17:50:20 by agianico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include "mlx.h"
-#include <math.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
+#ifndef CUB3D_H
+# define CUB3D_H
 
-#define KEY_A 0
-#define KEY_S 1
-#define KEY_D 2
-#define KEY_W 13
-#define KEY_ESC 53
+# include <stdlib.h>
+# include "mlx.h"
+# include <math.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <fcntl.h>
 
-#define KEY_LEFT 123
-#define KEY_RIGHT 124
-#define KEY_DOWN 125
-#define KEY_UP 126
+# define KEY_A 0
+# define KEY_S 1
+# define KEY_D 2
+# define KEY_W 13
+# define KEY_ESC 53
+
+# define KEY_LEFT 123
+# define KEY_RIGHT 124
+# define KEY_DOWN 125
+# define KEY_UP 126
 
 typedef struct		s_cub
 {
-	double			posx; // posiciones de inicio del personaje
+	double			posx; //posiciones de inicio del personaje
 	double			posy;
 	double			dirx; // dirección a la que mira el jugador
 	double			olddirx;
@@ -72,10 +75,6 @@ typedef struct		s_cub
 	int				right;
 	int				left;
 	int				**texture;
-	int				*n_text;
-	int				*n_text_info;
-	int				*n_text2;
-	int				*n_text_info2;
 	int				**map;
 	int				screenheight;
 	int				screenwidth;
@@ -122,23 +121,50 @@ typedef struct		s_cub
 	int				textheight;
 	int				textwidth;
 	char			orientation;
+	int				*n_text;
+	int				*n_text_info;
+	int				*n_text2;
+	int				*n_text_info2;
+	int				*n_text3;
+	int 			*n_text_info3;
+	int				*n_text4;
+	int 			*n_text_info4;
+	int				*n_text5;
+	int 			*n_text_info5;
+	int				*n_text6;
+	int 			*n_text_info6;
+	double			wallx;
+	int				texx;
+	int				texy;
+	double			step;
+	double			texpos;
+	int				stripe;
+	int				texx2;
+	int				texy2;
+	int				y_sprite;
+	int				d_sprite;
 }					t_cub;
 
+void				ft_read_map(t_cub *cub, char *map_path);
+int					ft_strlen(char *s);
+char				*ft_strdup(char *s);
+char				*ft_strjoin(char *s1, char *s2);
+char				*ft_substr(char *s, int start, int len);
+char				*ft_strchr(char *s, int c);
+int					get_next_line(char **line, int fd);
+void				ft_floor_ceiling(t_cub *cub);
+void				ft_draw_floor(t_cub *cub, int x, int y);
+void				ft_textures(t_cub *cub);
+void				ft_assign_textures(t_cub *cub);
+void				ft_create_image(t_cub *cub);
+void				ft_create_image2(t_cub *cub, int width, int height);
+void				ft_view(t_cub *cub);
+int					ft_exit_hook(void *param);
+int					move_player(void *param);
+int					key_pressed(int key, void *param);
+int					key_released(int key, void *param);
+void				ft_set_direction(t_cub *cub);
+void				ft_set_direction_west(t_cub *cub);
+void				ft_rgb_to_hex(char *buff_color, int time, int *pointer);
 
-void	ft_read_map(t_cub *cub, char *map_path);
-int		ft_strlen(char *s);
-char	*ft_strdup(char *s);
-char	*ft_strjoin(char *s1, char *s2);
-char	*ft_substr(char *s, int start, int len);
-char	*ft_strchr(char *s, int c);
-int		get_next_line(char **line, int fd);
-int		ft_music(void);
-void	ft_floor_ceiling(t_cub *cub);
-void	ft_textures(t_cub *cub);
-void	ft_view(t_cub *cub);
-int		exit_hook(void *param);
-int		move_player(void *param);
-int		key_pressed(int key, void *param);
-int		key_released(int key, void *param);
-void	ft_set_direction(t_cub *cub);
-void	ft_rgb_to_hex(char *buff_color, int time, int *pointer);
+#endif

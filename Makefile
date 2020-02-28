@@ -3,14 +3,14 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: agianico <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: agianico <agianico@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/02/27 16:19:18 by agianico          #+#    #+#              #
-#    Updated: 2020/02/27 16:27:22 by agianico         ###   ########.fr        #
+#    Updated: 2020/02/28 17:27:14 by agianico         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS =	cub3d.c get_next_line.c
+SRCS =	cub3d.c get_next_line.c ft_floor_ceiling.c ft_set_direction.c ft_textures.c ft_move_player.c
 
 OBJS =	$(SRCS:.c=.o)
 
@@ -27,7 +27,7 @@ NAME =	cub3d
 RM = rm -f
 
 $(NAME):
-		gcc $(FLAGS) -I $(PATH1) $(SRCS) -L $(PATH2) $(LIB_FLAGS) -o $(NAME) 
+		gcc $(FLAGS) -I $(PATH1) $(SRCS) -L $(PATH2) $(LIB_FLAGS) -o $(NAME)
 
 all:	$(NAME)
 
