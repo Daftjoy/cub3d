@@ -3,17 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:57:51 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/26 23:17:48 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/28 11:59:37 by agianico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdio.h>
 #include "cub3d.h"
 
 int ft_strlen(char *s)
@@ -30,7 +26,7 @@ char *ft_strdup(char *s)
 {
 	char *str;
 	int i;
-	
+
 	if (!s || !(str = malloc(ft_strlen(s) + 1)))
 		return (0);
 	i = 0;
@@ -48,7 +44,7 @@ char *ft_strjoin(char *s1, char *s2)
 	char *str;
 	int i;
 	int j;
-	
+
 	if (!s1 || !s2 || !(str = malloc(ft_strlen(s1) + ft_strlen(s2) + 1)))
 		return (0);
 	i = 0;
@@ -71,7 +67,7 @@ char *ft_substr(char *s, int start, int len)
 {
 	char *str;
 	int i;
-	
+
 	if (!s || !(str = malloc(len + 1)))
 		return (0);
 	i = 0;
@@ -180,7 +176,7 @@ void ft_read_map(t_cub *cub, char *map_path)
 	int n;
 	int height;
 	int width;
-	
+
 	cub->screenheight = 0;
 	cub->screenwidth = 0;
 	i = 0;
@@ -198,7 +194,7 @@ void ft_read_map(t_cub *cub, char *map_path)
 	line = NULL;
 	fd = open(map_path, O_RDONLY);
 	while(get_next_line(&line, fd) > 0)
-	{	
+	{
 		if(line[0] >= '0' && line[0] <= '9')
 		{
 			i = 0;
@@ -243,7 +239,7 @@ void ft_read_map(t_cub *cub, char *map_path)
 	n = 0;
 	fd = open(map_path, O_RDONLY);
 	while(get_next_line(&line, fd) > 0)
-	{	
+	{
 		if(line[0] >= '0' && line[0] <= '9')
 		{
 			while(line[i])
@@ -258,7 +254,8 @@ void ft_read_map(t_cub *cub, char *map_path)
 				{
 					cub->posx = j;
 					cub->posy = i;
-					map[j][i] = '0';
+					cub->orientation = line[i];
+					map[j][i] = 0;
 					i++;
 				}
 				else

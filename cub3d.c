@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/26 23:23:27 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/02/28 12:03:52 by agianico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,44 @@ int		ft_music(void)
 	return (0);
 }
 
+void	ft_set_direction(t_cub *cub)
+{
+	if (cub->orientation == 'N')
+	{
+		cub->dirx = -1.0;
+		cub->diry = 0.0;
+		cub->planex = 0.0;
+		cub->planey = 0.66;
+	}
+	else if (cub->orientation == 'S')
+	{
+		cub->dirx = 1.0;
+		cub->diry = 0.0;
+		cub->planex = 0.0;
+		cub->planey = -0.66;
+	}
+	else if (cub->orientation == 'E')
+	{
+		cub->dirx = 0.0;
+		cub->diry = 1.0;
+		cub->planex = 0.66;
+		cub->planey = 0.0;
+	}
+	else if (cub->orientation == 'W')
+	{
+		cub->dirx = 0.0;
+		cub->diry = -1.0;
+		cub->planex = -0.66;
+		cub->planey = 0.0;
+	}
+}
+
 void	ft_floor_ceiling(t_cub *cub)
 {
 	int		y;
 	int		x;
+
 	y = 0;
-		
 	while(y < cub->screenheight)
 	{
 		cub->raydirx0 = cub->dirx - cub->planex;
@@ -42,12 +74,11 @@ void	ft_floor_ceiling(t_cub *cub)
 		{
 			cub->cellx = (int)cub->floorx;
 			cub->celly = (int)cub->floory;
-			cub->tx = (int)(textwidth * (cub->floorx - cub->cellx)) & (textwidth - 1);
-			cub->ty = (int)(textheight * (cub->floory - cub->celly)) & (textheight - 1);
+			cub->tx = (int)(cub->textwidth * (cub->floorx - cub->cellx)) & (cub->textwidth - 1);
+			cub->ty = (int)(cub->textheight * (cub->floory - cub->celly)) & (cub->textheight - 1);
 			cub->floorx += cub->floorstepx;
 			cub->floory += cub->floorstepy;
-			cub->img_info[y * cub->screenwidth + x]= cub->texture[6][textheight * cub->tx + cub->ty];
-			//cub->img_info[(y * cub->screenwidth -1) + x]= cub->texture[5][textheight * cub->tx + cub->ty];
+			cub->img_info[y * cub->screenwidth + x]= cub->texture[6][cub->textheight * cub->tx + cub->ty];
 			x++;
 		}
 		y++;
@@ -69,7 +100,7 @@ void	ft_textures(t_cub *cub)
 	int 	*n_text_info5;
 	int		*n_text6;
 	int 	*n_text_info6;
-	
+
 	i = 0;
 	x = 0;
 	y = 0;
@@ -90,13 +121,13 @@ void	ft_textures(t_cub *cub)
 	cub->texture = malloc(sizeof(int *) * 8);
 	while(i < 7)
 	{
-		cub->texture[i] = malloc(sizeof(int)* textwidth * textheight);
+		cub->texture[i] = malloc(sizeof(int)* cub->textwidth * cub->textheight);
 		i++;
 	}
-	while (x < textwidth)
+	while (x < cub->textwidth)
 	{
 		y = 0;
-		while (y < textheight)
+		while (y < cub->textheight)
 		{
 			cub->texture[0] = cub->n_text_info; //SO
     		cub->texture[1] = cub->n_text_info2; //NO
@@ -122,7 +153,7 @@ void	ft_view(t_cub *cub)
 	y = 0;
 	z = 0;
 	temp = 0;
-	if (!(cub->zBuffer = malloc(sizeof(double) * cub->screenwidth + 1)))
+	if (!(cub->zbuffer = malloc(sizeof(double) * cub->screenwidth + 1)))
 		return ;
 	cub->img_ptr = mlx_new_image(cub->mlx_ptr,cub->screenwidth, cub->screenheight);
 	cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr, &cub->bpp, &cub->ls, &cub->endian);
@@ -194,12 +225,12 @@ void	ft_view(t_cub *cub)
 		else
 			wallx = cub->posx + cub->perpwalldist * cub->raydirx;
 		wallx -= floor(wallx);
-		int texx = (int)(wallx * (double)textwidth);
+		int texx = (int)(wallx * (double)cub->textwidth);
 		if (cub->side == 0 && cub->raydirx > 0)
-			texx = textwidth - texx -1;
+			texx = cub->textwidth - texx -1;
 		if (cub->side == 1 && cub->raydiry < 0)
-			texx = textwidth - texx -1;
-		double step = 1.0 * textheight / cub->lineheight;
+			texx = cub->textwidth - texx -1;
+		double step = 1.0 * cub->textheight / cub->lineheight;
 		double texpos = (cub->drawstart - cub->screenheight / 2 + cub->lineheight / 2) * step;
 		while(z < y)
 		{
@@ -208,20 +239,20 @@ void	ft_view(t_cub *cub)
 		}
 		while (y < cub->drawend)
 		{
-			int texy = (int)texpos & (textheight - 1);
+			int texy = (int)texpos & (cub->textheight - 1);
 			texpos +=step;
 			if(cub->side == 1 && cub->mapy > cub->posy)
-				cub->img_info[y *cub->screenwidth + x] = cub->texture[3][textheight * texy + texx];
+				cub->img_info[y *cub->screenwidth + x] = cub->texture[3][cub->textheight * texy + texx];
 			else if(cub->side == 1 && cub->mapy < cub->posy)
-				cub->img_info[y *cub->screenwidth + x] = cub->texture[2][textheight * texy + texx];
+				cub->img_info[y *cub->screenwidth + x] = cub->texture[2][cub->textheight * texy + texx];
 			else if(cub->side == 0 && cub->mapx > cub->posx)
-				cub->img_info[y *cub->screenwidth + x] = cub->texture[0][textheight * texy + texx];
+				cub->img_info[y *cub->screenwidth + x] = cub->texture[0][cub->textheight * texy + texx];
 			else
-				cub->img_info[y *cub->screenwidth + x] = cub->texture[1][textheight * texy + texx];
+				cub->img_info[y *cub->screenwidth + x] = cub->texture[1][cub->textheight * texy + texx];
 			y++;
 		}
 		z = 0;
-		cub->zBuffer[x] = cub->perpwalldist;
+		cub->zbuffer[x] = cub->perpwalldist;
 		x++;
 	}
 	x = 0;
@@ -277,26 +308,27 @@ void	ft_view(t_cub *cub)
 		int stripe = cub->drawstartx;
 		while (stripe < cub->drawendx)
 		{
-			int texx = (int)(256 * (stripe - (-cub->spritewidth / 2 + cub->spritescreenx)) * textwidth / cub->spritewidth) / 256;
-			if (cub->transformy > 0 && stripe > 0 && stripe < cub->screenwidth && cub->transformy < cub->zBuffer[stripe])
+			int texx = (int)(256 * (stripe - (-cub->spritewidth / 2 + cub->spritescreenx)) * cub->textwidth / cub->spritewidth) / 256;
+			if (cub->transformy > 0 && stripe > 0 && stripe < cub->screenwidth && cub->transformy < cub->zbuffer[stripe])
 			{
 				int y = cub->drawstarty;
 				while (y < cub->drawendy)
 				{
 					int d = (y) * 256 - cub->screenheight * 128 + cub->spriteheight * 128;
-					int texy = ((d * textheight) / cub->spriteheight) / 256;
-					if (cub->texture[4][textwidth * texy + texx] != 0)
-						cub->img_info[y * cub->screenwidth + stripe] =  cub->texture[4][textwidth * texy + texx];
+					int texy = ((d * cub->textheight) / cub->spriteheight) / 256;
+					if (cub->texture[4][cub->textwidth * texy + texx] != 0)
+						cub->img_info[y * cub->screenwidth + stripe] =  cub->texture[4][cub->textwidth * texy + texx];
 					y++;
 				}
 			}
 			stripe++;
-		}	
+		}
 		x++;
 	}
 	mlx_put_image_to_window(cub->mlx_ptr, cub->win_ptr, cub->img_ptr, 0, 0);
 	mlx_destroy_image(cub->mlx_ptr, cub->img_ptr);
 }
+
 int exit_hook(void *param)
 {
 	t_cub *cub;
@@ -367,7 +399,7 @@ int key_pressed(int key, void *param)
 {
 	t_cub	*cub;
 	cub = (t_cub *)param;
-	
+
 	if (key == 0)
 		cub->a = 1;
 	if (key == 1)
@@ -393,7 +425,7 @@ int key_released(int key, void *param)
 {
 	t_cub	*cub;
 	cub = (t_cub *)param;
-	
+
 	if (key == 0)
 		cub->a = 0;
 	if (key == 1)
@@ -412,18 +444,19 @@ int key_released(int key, void *param)
 int main(int argc, char **argv)
 {
 	t_cub	*cub;
-	int x;
-	
-	x = 0;
+
 	if (argc == 2 || argc == 3)
 	{
 		if (!(cub = malloc(sizeof(t_cub))))
 			return (0);
 		ft_read_map(cub, argv[1]);
-		cub->dirx = -1.0;
-		cub->diry = 0.0;
-		cub->planex = 0.0;
-		cub->planey = 0.66;
+		ft_set_direction(cub);
+		cub->textheight = 64;
+		cub->textwidth = 64;
+		//cub->dirx = -1.0;
+		//cub->diry = 0.0;
+		//cub->planex = 0.0;
+		//cub->planey = 0.66;
 		cub->mlx_ptr = mlx_init();
 		cub->win_ptr = mlx_new_window(cub->mlx_ptr,cub->screenwidth, cub->screenheight, "Marisco");
 		cub->rotspeed  =  0.05;
