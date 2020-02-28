@@ -6,7 +6,7 @@
 /*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:57:51 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/28 11:59:37 by agianico         ###   ########.fr       */
+/*   Updated: 2020/02/28 13:35:53 by agianico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,6 +165,27 @@ int get_next_line(char **line, int fd)
 	return (1);
 }
 
+void	ft_rgb_to_hex(char *buff_color, int time, int *pointer)
+{
+	int		i;
+	int		num;
+	int		div;
+
+	if (time == 1)
+		div = 256 * 256;
+	if (time == 2)
+		div = 256;
+	if (time == 3)
+		div = 1;
+	i = 0;
+	num = 0;
+	while (buff_color[i])
+	{
+		num = num * 10 + (buff_color[i] - '0');
+		i++;
+	}
+	*pointer = *pointer + num * div;
+}
 
 void ft_read_map(t_cub *cub, char *map_path)
 {
@@ -176,6 +197,8 @@ void ft_read_map(t_cub *cub, char *map_path)
 	int n;
 	int height;
 	int width;
+	char *buff_color;
+	int time;
 
 	cub->screenheight = 0;
 	cub->screenwidth = 0;
@@ -189,8 +212,6 @@ void ft_read_map(t_cub *cub, char *map_path)
 	cub->path_we = malloc(sizeof(char) * 100);
 	cub->path_ea = malloc(sizeof(char) * 100);
 	cub->path_sprite = malloc(sizeof(char) * 100);
-	cub->floor_color = malloc(sizeof(char) * 100);
-	cub->ceiling_color = malloc(sizeof(char) * 100);
 	line = NULL;
 	fd = open(map_path, O_RDONLY);
 	while(get_next_line(&line, fd) > 0)
@@ -288,8 +309,6 @@ void ft_read_map(t_cub *cub, char *map_path)
 	free(line);
 	line = NULL;
 	fd = open(map_path, O_RDONLY);
-	//char *line;
-	//line = NULL;
 	while(get_next_line(&line, fd) >0)
 	{
 		if(line[0] == 'R')
@@ -405,39 +424,76 @@ void ft_read_map(t_cub *cub, char *map_path)
 		}
 		if (line [0] == 'F' && line[1] == ' ')
 		{
+			time = 0;
 			i = 2;
 			while (line[i])
 			{
-				if(line[i] == ' ')
+				if(line[i] == ' ' || line[i] == ',')
 					i++;
 				else
 				{
-					cub->floor_color[j] = line[i];
-					j++;
-					i++;
+					buff_color = malloc(sizeof(char) * 4);
+					while (line[i]>= '0' && line[i] <= '9')
+					{
+					//	ft_rgb_to_hex(cub);
+						buff_color[j] = line[i];
+						j++;
+						i++;
+					}
+					time++;
+					buff_color[j] = '\0';
+					ft_rgb_to_hex(buff_color, time, &cub->floor_color);
+					free(buff_color);
+					j = 0;
 				}
 			}
-			cub->floor_color[j] = '\0';
-			j = 0;
 			i = 0;
 		}
 		if (line [0] == 'C' && line[1] == ' ')
 		{
+			time = 0;
 			i = 2;
 			while (line[i])
 			{
-				if (line[i] == ' ')
+				if(line[i] == ' ' || line[i] == ',')
 					i++;
 				else
 				{
-					cub->ceiling_color[j] = line[i];
-					j++;
-					i++;
+					buff_color = malloc(sizeof(char) * 4);
+					while (line[i]>= '0' && line[i] <= '9')
+					{
+					//	ft_rgb_to_hex(cub);
+						buff_color[j] = line[i];
+						j++;
+						i++;
+					}
+					time++;
+					buff_color[j] = '\0';
+					ft_rgb_to_hex(buff_color, time, &cub->ceiling_color);
+					free(buff_color);
+					j = 0;
 				}
+			}
+			i = 0;
+		}
+	/*	if (line [0] == 'C' && line[1] == ' ')
+		{
+			i = 2;
+			while (line[i])
+			{
+				if(line[i] == ' ' || line[i] == ',')
+					i++;
+				else
+					while (line[i]>= '0' && line[i] <= '9')
+					{
+						cub->ceiling_color[j] = line[i];
+						j++;
+						i++;
+					}
 			}
 			cub->ceiling_color[j] = '\0';
 			j = 0;
 			i = 0;
-		}
+		}*/
 	}
 }

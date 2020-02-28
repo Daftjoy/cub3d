@@ -6,7 +6,7 @@
 /*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/15 13:02:36 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/28 12:03:52 by agianico         ###   ########.fr       */
+/*   Updated: 2020/02/28 13:35:26 by agianico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,7 +234,7 @@ void	ft_view(t_cub *cub)
 		double texpos = (cub->drawstart - cub->screenheight / 2 + cub->lineheight / 2) * step;
 		while(z < y)
 		{
-			cub->img_info[z *cub->screenwidth + x] = 0x99FFFF;
+			cub->img_info[z *cub->screenwidth + x] = cub->ceiling_color;
 			z++;
 		}
 		while (y < cub->drawend)
@@ -250,6 +250,12 @@ void	ft_view(t_cub *cub)
 			else
 				cub->img_info[y *cub->screenwidth + x] = cub->texture[1][cub->textheight * texy + texx];
 			y++;
+		}
+		z = cub->drawend;
+		while (z < cub->screenheight)
+		{
+			cub->img_info[z *cub->screenwidth + x] = cub->floor_color;
+			z++;
 		}
 		z = 0;
 		cub->zbuffer[x] = cub->perpwalldist;
@@ -329,7 +335,7 @@ void	ft_view(t_cub *cub)
 	mlx_destroy_image(cub->mlx_ptr, cub->img_ptr);
 }
 
-int exit_hook(void *param)
+int		exit_hook(void *param)
 {
 	t_cub *cub;
 
@@ -339,7 +345,7 @@ int exit_hook(void *param)
 	exit(0);
 	return(0);
 }
-int move_player(void *param)
+int		move_player(void *param)
 {
 	t_cub	*cub;
 
@@ -395,7 +401,7 @@ int move_player(void *param)
 }
 
 
-int key_pressed(int key, void *param)
+int		key_pressed(int key, void *param)
 {
 	t_cub	*cub;
 	cub = (t_cub *)param;
@@ -421,7 +427,7 @@ int key_pressed(int key, void *param)
 	return (0);
 }
 
-int key_released(int key, void *param)
+int		key_released(int key, void *param)
 {
 	t_cub	*cub;
 	cub = (t_cub *)param;
@@ -441,7 +447,7 @@ int key_released(int key, void *param)
 	return (0);
 }
 
-int main(int argc, char **argv)
+int		main(int argc, char **argv)
 {
 	t_cub	*cub;
 
@@ -453,10 +459,6 @@ int main(int argc, char **argv)
 		ft_set_direction(cub);
 		cub->textheight = 64;
 		cub->textwidth = 64;
-		//cub->dirx = -1.0;
-		//cub->diry = 0.0;
-		//cub->planex = 0.0;
-		//cub->planey = 0.66;
 		cub->mlx_ptr = mlx_init();
 		cub->win_ptr = mlx_new_window(cub->mlx_ptr,cub->screenwidth, cub->screenheight, "Marisco");
 		cub->rotspeed  =  0.05;

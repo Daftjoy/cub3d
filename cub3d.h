@@ -6,7 +6,7 @@
 /*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/21 12:05:59 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/28 12:03:29 by agianico         ###   ########.fr       */
+/*   Updated: 2020/02/28 13:37:38 by agianico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,8 @@ typedef struct		s_cub
 	char			*path_we;
 	char			*path_ea;
 	char			*path_sprite;
-	char			*floor_color;
-	char			*ceiling_color;
+	int				floor_color;
+	int				ceiling_color;
 	float			raydirx0;
 	float			raydiry0;
 	float			raydirx1;
@@ -141,3 +141,4 @@ int		move_player(void *param);
 int		key_pressed(int key, void *param);
 int		key_released(int key, void *param);
 void	ft_set_direction(t_cub *cub);
+void	ft_rgb_to_hex(char *buff_color, int time, int *pointer);
