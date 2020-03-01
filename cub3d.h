@@ -6,7 +6,7 @@
 /*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/21 12:05:59 by antmarti          #+#    #+#             */
-/*   Updated: 2020/02/28 17:50:20 by agianico         ###   ########.fr       */
+/*   Updated: 2020/03/01 17:59:16 by agianico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,13 +126,13 @@ typedef struct		s_cub
 	int				*n_text2;
 	int				*n_text_info2;
 	int				*n_text3;
-	int 			*n_text_info3;
+	int				*n_text_info3;
 	int				*n_text4;
-	int 			*n_text_info4;
+	int				*n_text_info4;
 	int				*n_text5;
-	int 			*n_text_info5;
+	int				*n_text_info5;
 	int				*n_text6;
-	int 			*n_text_info6;
+	int				*n_text_info6;
 	double			wallx;
 	int				texx;
 	int				texy;
@@ -146,25 +146,43 @@ typedef struct		s_cub
 }					t_cub;
 
 void				ft_read_map(t_cub *cub, char *map_path);
+void				ft_floor_ceiling(t_cub *cub);
+void				ft_draw_floor(t_cub *cub, int x, int y);
+void				ft_view(t_cub *cub);
+void				ft_init(t_cub *cub);
+void				raycasting_init(t_cub *cub, int x, int y, int z);
+void				raycasting_first_part(t_cub *cub, int x);
+void				raycasting_second_part(t_cub *cub);
+void				raycasting_third_part(t_cub *cub);
+void				raycasting_fourth_part(t_cub *cub, int *y);
+void				raycasting_fifth_part(t_cub *cub, int y, int x);
+void				ft_textures(t_cub *cub);
+void				ft_assign_textures(t_cub *cub);
+void				ft_create_image(t_cub *cub);
+void				ft_create_image2(t_cub *cub, int width, int height);
+int					ft_exit_hook(void *param);
+void				ft_mlx(t_cub *cub);
+int					move_player(void *param);
+void				rotate_player_to_left(t_cub *cub);
+void				rotate_player_to_right(t_cub *cub);
+void				move_player_to_right(t_cub *cub);
+void				move_player_to_left(t_cub *cub);
+void				move_player_back(t_cub *cub);
+void				move_player_forward(t_cub *cub);
+int					key_pressed(int key, void *param);
+int					key_released(int key, void *param);
+void				ft_set_direction(t_cub *cub);
+void				ft_set_direction_west(t_cub *cub);
+void				ft_sprites(t_cub *cub);
+void				sprites_numb_and_order(t_cub *cub, int x, double temp);
+void				sprites_first_part(t_cub *cub, int x);
+void				draw_sprites(t_cub *cub);
 int					ft_strlen(char *s);
 char				*ft_strdup(char *s);
 char				*ft_strjoin(char *s1, char *s2);
 char				*ft_substr(char *s, int start, int len);
 char				*ft_strchr(char *s, int c);
 int					get_next_line(char **line, int fd);
-void				ft_floor_ceiling(t_cub *cub);
-void				ft_draw_floor(t_cub *cub, int x, int y);
-void				ft_textures(t_cub *cub);
-void				ft_assign_textures(t_cub *cub);
-void				ft_create_image(t_cub *cub);
-void				ft_create_image2(t_cub *cub, int width, int height);
-void				ft_view(t_cub *cub);
-int					ft_exit_hook(void *param);
-int					move_player(void *param);
-int					key_pressed(int key, void *param);
-int					key_released(int key, void *param);
-void				ft_set_direction(t_cub *cub);
-void				ft_set_direction_west(t_cub *cub);
 void				ft_rgb_to_hex(char *buff_color, int time, int *pointer);
 
 #endif
