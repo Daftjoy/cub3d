@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_textures.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
+/*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/28 17:15:43 by agianico          #+#    #+#             */
-/*   Updated: 2020/03/01 17:02:37 by agianico         ###   ########.fr       */
+/*   Updated: 2020/03/02 21:02:36 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,9 @@ void	ft_create_image(t_cub *cub)
 
 void	ft_assign_textures(t_cub *cub)
 {
-	cub->texture[0] = cub->n_text_info; //SO
-	cub->texture[1] = cub->n_text_info2; //NO
-	cub->texture[2] = cub->n_text_info3; //WE
+	cub->texture[0] = cub->n_text_info;//SO
+	cub->texture[1] = cub->n_text_info2;//NO
+	cub->texture[2] = cub->n_text_info3;//WE
 	cub->texture[3] = cub->n_text_info4;//EA
 	cub->texture[4] = cub->n_text_info5;//SPRITE
 	cub->texture[5] = cub->n_text_info;//SKY

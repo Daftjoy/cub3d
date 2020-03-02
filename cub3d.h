@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
+/*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/21 12:05:59 by antmarti          #+#    #+#             */
-/*   Updated: 2020/03/01 17:59:16 by agianico         ###   ########.fr       */
+/*   Updated: 2020/03/02 20:24:08 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,6 +143,8 @@ typedef struct		s_cub
 	int				texy2;
 	int				y_sprite;
 	int				d_sprite;
+	int				map_h;
+	int				map_w;
 }					t_cub;
 
 void				ft_read_map(t_cub *cub, char *map_path);
@@ -184,5 +186,17 @@ char				*ft_substr(char *s, int start, int len);
 char				*ft_strchr(char *s, int c);
 int					get_next_line(char **line, int fd);
 void				ft_rgb_to_hex(char *buff_color, int time, int *pointer);
+int					ft_append(int ret, char **file, int fd, char *buffer);
+int					ft_saver(char **file, char **line);
+int					ft_return_0(char *buffer, char **line);
+int					ft_return_1(char *buffer);
+void				ft_loop(t_cub *cub, char *line);
+int					ft_loop2(t_cub *cub, char *line, int j, int n);
+void				ft_map_size(t_cub *cub, char *map_path, char *line);
+void				ft_map(t_cub *cub, char *line, char *map_path);
+char				*ft_path(char *line);
+void				ft_color(char *line, int *type);
+void				ft_read_map2(t_cub *cub, char *map_path, char *line);
+void				ft_resolution(t_cub *cub, char *line);
 
 #endif

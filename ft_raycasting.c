@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_raycasting.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
+/*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/01 16:30:02 by agianico          #+#    #+#             */
-/*   Updated: 2020/03/01 17:22:34 by agianico         ###   ########.fr       */
+/*   Updated: 2020/03/02 21:01:57 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,21 @@ void	raycasting_first_part(t_cub *cub, int x)
 	cub->deltadistx = fabs(1 / cub->raydirx);
 	cub->deltadisty = fabs(1 / cub->raydiry);
 	cub->hit = 0;
-	cub->deltadistx = (cub->raydiry == 0) ? 0 : ((cub->raydirx == 0) ? 1 : fabs(1 / cub->raydirx));
-	cub->deltadisty = (cub->raydirx == 0) ? 0 : ((cub->raydiry == 0) ? 1 : fabs(1 / cub->raydiry));
+	if (cub->raydiry == 0)
+	{
+		cub->deltadistx = 0;
+		cub->deltadisty = (cub->raydirx == 0) ? 0 : 1;
+	}
+	else if (cub->raydirx == 0)
+	{
+		cub->deltadisty = 0;
+		cub->deltadistx = 1;
+	}
+	else
+	{
+		cub->deltadistx = fabs(1 / cub->raydirx);
+		cub->deltadisty = fabs(1 / cub->raydiry);
+	}
 }
 
 void	raycasting_second_part(t_cub *cub)
