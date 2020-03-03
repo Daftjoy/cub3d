@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_key_detect.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
+/*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/01 15:29:51 by agianico          #+#    #+#             */
-/*   Updated: 2020/03/01 15:30:02 by agianico         ###   ########.fr       */
+/*   Updated: 2020/03/03 21:22:38 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,7 @@ int		key_pressed(int key, void *param)
 	if (key == 123)
 		cub->left = 1;
 	if (key == 53)
-	{
-		system("killall afplay");
-		free(cub);
-		exit(0);
-	}
+		ft_exit_hook(cub);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/02 20:22:13 by antmarti          #+#    #+#             */
-/*   Updated: 2020/03/02 20:25:33 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/03/03 21:37:00 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,9 @@ void	ft_read_map2(t_cub *cub, char *map_path, char *line)
 			ft_color(line, &cub->floor_color);
 		if (line[0] == 'C' && line[1] == ' ')
 			ft_color(line, &cub->ceiling_color);
+		free(line);
 	}
+	free(line);
 }
 
 void	ft_read_map(t_cub *cub, char *map_path)
@@ -101,10 +103,6 @@ void	ft_read_map(t_cub *cub, char *map_path)
 	cub->sprites_numb = 0;
 	cub->map_h = 0;
 	cub->map_w = 0;
-	cub->path_so = malloc(sizeof(char) * 100);
-	cub->path_we = malloc(sizeof(char) * 100);
-	cub->path_ea = malloc(sizeof(char) * 100);
-	cub->path_sprite = malloc(sizeof(char) * 100);
 	line = NULL;
 	ft_map_size(cub, map_path, line);
 	if (!(cub->spritex = malloc(sizeof(double) * cub->sprites_numb)))

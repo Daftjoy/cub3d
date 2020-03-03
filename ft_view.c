@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_view.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
+/*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/01 18:00:27 by agianico          #+#    #+#             */
-/*   Updated: 2020/03/01 18:00:32 by agianico         ###   ########.fr       */
+/*   Updated: 2020/03/03 21:10:27 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 void	ft_init(t_cub *cub)
 {
-	if (!(cub->zbuffer = malloc(sizeof(double) * cub->screenwidth + 1)))
-		return ;
 	cub->img_ptr = mlx_new_image(cub->mlx_ptr,
 	cub->screenwidth, cub->screenheight);
 	cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr,

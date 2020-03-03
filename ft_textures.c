@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/28 17:15:43 by agianico          #+#    #+#             */
-/*   Updated: 2020/03/02 21:02:36 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/03/03 21:33:49 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,12 +72,6 @@ void	ft_textures(t_cub *cub)
 	y = 0;
 	ft_create_image(cub);
 	cub->texture = malloc(sizeof(int *) * 8);
-	while (i < 7)
-	{
-		cub->texture[i] = malloc(sizeof(int)
-		* cub->textwidth * cub->textheight);
-		i++;
-	}
 	while (x < cub->textwidth)
 	{
 		y = 0;

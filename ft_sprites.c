@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_sprites.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agianico <agianico@student.42.fr>          +#+  +:+       +#+        */
+/*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/01 15:54:16 by agianico          #+#    #+#             */
-/*   Updated: 2020/03/01 16:21:26 by agianico         ###   ########.fr       */
+/*   Updated: 2020/03/03 21:09:37 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,8 @@ void	draw_sprites(t_cub *cub)
 
 void	sprites_first_part(t_cub *cub, int x)
 {
-	cub->spriteposx = cub->spritex[cub->spriteorder[x]] - cub->posx;
-	cub->spriteposy = cub->spritey[cub->spriteorder[x]] - cub->posy;
+	cub->spriteposx = cub->spritex[cub->spriteorder[x]] - cub->posx + 0.5;
+	cub->spriteposy = cub->spritey[cub->spriteorder[x]] - cub->posy + 0.5;
 	cub->invdet = 1.0 / (cub->planex * cub->diry - cub->dirx * cub->planey);
 	cub->transformx = cub->invdet *
 	(cub->diry * cub->spriteposx - cub->dirx * cub->spriteposy);
@@ -115,4 +115,6 @@ void	ft_sprites(t_cub *cub)
 		}
 		x++;
 	}
+	free(cub->spriteorder);
+	free(cub->spritedistance);
 }

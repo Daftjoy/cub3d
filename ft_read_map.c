@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/02 17:00:40 by antmarti          #+#    #+#             */
-/*   Updated: 2020/03/02 20:25:43 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/03/03 21:36:38 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,11 @@ void	ft_map_size(t_cub *cub, char *map_path, char *line)
 	j = 0;
 	fd = open(map_path, O_RDONLY);
 	while (get_next_line(&line, fd) > 0)
+	{
 		if (line[0] >= '0' && line[0] <= '9')
 			ft_loop(cub, line);
+		free(line);
+	}
 	if (line[0] >= '0' && line[0] <= '9')
 		ft_loop(cub, line);
 	cub->map_w = ft_strlen(line);
@@ -100,9 +103,11 @@ void	ft_map(t_cub *cub, char *line, char *map_path)
 			n = ft_loop2(cub, line, j, n);
 			j++;
 		}
+		free(line);
 	}
 	if (line[0] >= '0' && line[0] <= '9')
 		ft_loop2(cub, line, j, n);
+	free(line);
 }
 
 void	ft_resolution(t_cub *cub, char *line)

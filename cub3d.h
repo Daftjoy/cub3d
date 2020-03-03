@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/21 12:05:59 by antmarti          #+#    #+#             */
-/*   Updated: 2020/03/02 20:24:08 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/03/03 19:40:57 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <fcntl.h>
+# include <string.h>
 
 # define KEY_A 0
 # define KEY_S 1
@@ -30,6 +31,10 @@
 # define KEY_RIGHT 124
 # define KEY_DOWN 125
 # define KEY_UP 126
+
+# define FILE_HEADER_SIZE 14
+# define INFO_HEADER_SIZE 40
+# define BYTES_PER_PIXEL 4
 
 typedef struct		s_cub
 {
@@ -198,5 +203,6 @@ char				*ft_path(char *line);
 void				ft_color(char *line, int *type);
 void				ft_read_map2(t_cub *cub, char *map_path, char *line);
 void				ft_resolution(t_cub *cub, char *line);
+int					save_bmp(t_cub *cub);
 
 #endif
