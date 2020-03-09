@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/28 17:15:43 by agianico          #+#    #+#             */
-/*   Updated: 2020/03/03 21:33:49 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/03/09 18:13:48 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,13 @@ void	ft_create_image(t_cub *cub)
 
 void	ft_assign_textures(t_cub *cub)
 {
-	cub->texture[0] = cub->n_text_info;//SO
-	cub->texture[1] = cub->n_text_info2;//NO
-	cub->texture[2] = cub->n_text_info3;//WE
-	cub->texture[3] = cub->n_text_info4;//EA
-	cub->texture[4] = cub->n_text_info5;//SPRITE
-	cub->texture[5] = cub->n_text_info;//SKY
-	cub->texture[6] = cub->n_text_info6;//FLOOR
+	cub->texture[0] = cub->n_text_info;
+	cub->texture[1] = cub->n_text_info2;
+	cub->texture[2] = cub->n_text_info3;
+	cub->texture[3] = cub->n_text_info4;
+	cub->texture[4] = cub->n_text_info5;
+	cub->texture[5] = cub->n_text_info;
+	cub->texture[6] = cub->n_text_info6;
 }
 
 void	ft_textures(t_cub *cub)
@@ -70,6 +70,8 @@ void	ft_textures(t_cub *cub)
 	i = 0;
 	x = 0;
 	y = 0;
+	cub->textheight = 64;
+	cub->textwidth = 64;
 	ft_create_image(cub);
 	cub->texture = malloc(sizeof(int *) * 8);
 	while (x < cub->textwidth)

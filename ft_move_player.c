@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/28 17:21:34 by agianico          #+#    #+#             */
-/*   Updated: 2020/03/03 21:03:13 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/03/09 18:14:13 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,20 +43,20 @@ void	rotate_player_to_right(t_cub *cub)
 void	move_player_to_right(t_cub *cub)
 {
 	if (cub->map[(int)(cub->posx + cub->planex * cub->movespeed)]
-	[(int)cub->posy] != 1)
+	[(int)cub->posy] == 0)
 		cub->posx += cub->planex * cub->movespeed;
 	if (cub->map[(int)cub->posx]
-	[(int)(cub->posy + cub->planey * cub->movespeed)] != 1)
+	[(int)(cub->posy + cub->planey * cub->movespeed)] == 0)
 		cub->posy += cub->planey * cub->movespeed;
 }
 
 void	move_player_to_left(t_cub *cub)
 {
 	if (cub->map[(int)(cub->posx - cub->planex * cub->movespeed)]
-	[(int)cub->posy] != 1)
+	[(int)cub->posy] == 0)
 		cub->posx -= cub->planex * cub->movespeed;
 	if (cub->map[(int)cub->posx]
-	[(int)(cub->posy - cub->planey * cub->movespeed)] != 1)
+	[(int)(cub->posy - cub->planey * cub->movespeed)] == 0)
 		cub->posy -= cub->planey * cub->movespeed;
 }
 
@@ -65,13 +65,13 @@ int		move_player(void *param)
 	t_cub	*cub;
 
 	cub = (t_cub *)param;
-	if (cub->w == 1)//W
+	if (cub->w == 1)
 		move_player_forward(cub);
-	if (cub->s == 1)//S
+	if (cub->s == 1)
 		move_player_back(cub);
-	if (cub->a == 1)//A
+	if (cub->a == 1)
 		move_player_to_left(cub);
-	if (cub->d == 1)//D
+	if (cub->d == 1)
 		move_player_to_right(cub);
 	if (cub->left == 1)
 		rotate_player_to_left(cub);

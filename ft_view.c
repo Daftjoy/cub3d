@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/01 18:00:27 by agianico          #+#    #+#             */
-/*   Updated: 2020/03/03 21:10:27 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/03/09 16:59:51 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	ft_init(t_cub *cub)
 {
+	cub->rotspeed = 0.05;
+	cub->movespeed = 0.1;
 	cub->img_ptr = mlx_new_image(cub->mlx_ptr,
 	cub->screenwidth, cub->screenheight);
 	cub->img_info = (int *)mlx_get_data_addr(cub->img_ptr,
@@ -37,11 +39,6 @@ void	raycasting_init(t_cub *cub, int x, int y, int z)
 	}
 	raycasting_fifth_part(cub, y, x);
 	z = cub->drawend;
-	while (z < cub->screenheight)
-	{
-		cub->img_info[z * cub->screenwidth + x] = cub->floor_color;
-		z++;
-	}
 	z = 0;
 	cub->zbuffer[x] = cub->perpwalldist;
 }

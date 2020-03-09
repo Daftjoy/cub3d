@@ -5,133 +5,137 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/03/02 17:00:40 by antmarti          #+#    #+#             */
-/*   Updated: 2020/03/03 21:36:38 by antmarti         ###   ########.fr       */
+/*   Created: 2020/03/02 20:22:13 by antmarti          #+#    #+#             */
+/*   Updated: 2020/03/09 20:43:06 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	ft_loop(t_cub *cub, char *line)
+char	*ft_path(char *line)
 {
-	int i;
-	int j;
-	int n;
+	int		j;
+	int		i;
+	char	*path;
 
-	i = 0;
 	j = 0;
-	n = 0;
+	i = 0;
+	path = malloc(sizeof(char) * 100);
 	while (line[i])
 	{
-		if (line[i] == '2')
-			cub->sprites_numb++;
-		i++;
-	}
-	cub->map_h++;
-}
-
-int		ft_loop2(t_cub *cub, char *line, int j, int n)
-{
-	int i;
-
-	i = 0;
-	while (line[i])
-	{
-		cub->map[j][i] = line[i] - '0';
-		if (line[i] == '2')
+		if (line[i] == ' ')
+			i++;
+		else
 		{
-			cub->spritex[n] = i;
-			cub->spritey[n] = j;
-			n++;
-		}
-		if (line[i] == 'W' || line[i] == 'N' ||
-		line[i] == 'S' || line[i] == 'E')
-		{
-			cub->posx = j;
-			cub->posy = i;
-			cub->orientation = line[i];
-			cub->map[j][i] = 0;
-		}
-		i++;
-	}
-	return (n);
-}
-
-void	ft_map_size(t_cub *cub, char *map_path, char *line)
-{
-	int	j;
-	int fd;
-
-	j = 0;
-	fd = open(map_path, O_RDONLY);
-	while (get_next_line(&line, fd) > 0)
-	{
-		if (line[0] >= '0' && line[0] <= '9')
-			ft_loop(cub, line);
-		free(line);
-	}
-	if (line[0] >= '0' && line[0] <= '9')
-		ft_loop(cub, line);
-	cub->map_w = ft_strlen(line);
-	free(line);
-	line = NULL;
-	if (!(cub->map = malloc(sizeof(int *) * cub->map_h)))
-		return ;
-	while (j < cub->map_h)
-	{
-		if (!(cub->map[j] = malloc(sizeof(int) * cub->map_w)))
-			return ;
-		j++;
-	}
-}
-
-void	ft_map(t_cub *cub, char *line, char *map_path)
-{
-	int i;
-	int fd;
-	int j;
-	int n;
-
-	i = 0;
-	j = 0;
-	n = 0;
-	fd = open(map_path, O_RDONLY);
-	while (get_next_line(&line, fd) > 0)
-	{
-		if (line[0] >= '0' && line[0] <= '9')
-		{
-			n = ft_loop2(cub, line, j, n);
+			path[j] = line[i];
+			i++;
 			j++;
 		}
+	}
+	path[j] = '\0';
+	i = 0;
+	return (path);
+}
+
+void	ft_color(char *line, int *type, t_cub *cub)
+{
+	int		i;
+	int		time;
+	int		j;
+	char	*buff_color;
+
+	time = 0;
+	i = 0;
+	while (line[i++])
+	{
+		if (line[i] == '-')
+			ft_error(cub, 2);
+		j = 0;
+		if (line[i] >= '0' && line[i] <= '9')
+		{
+			buff_color = malloc(sizeof(char) * 4);
+			while (line[i] >= '0' && line[i] <= '9')
+				buff_color[j++] = line[i++];
+			time++;
+			buff_color[j] = '\0';
+			ft_rgb_to_hex(buff_color, time, type, cub);
+			free(buff_color);
+		}
+	}
+	if (time <= 0 || time < 3)
+		ft_error(cub, 2);
+}
+
+void	ft_read_map2(t_cub *cub, char *map_path, char *line)
+{
+	int	fd;
+	int	i;
+
+	i = 0;
+	fd = open(map_path, O_RDONLY);
+	while (get_next_line(&line, fd) > 0)
+	{
+		i = 0;
+		while (line[i] == ' ')
+			i++;
+		ft_read_map3(cub, line, i);
 		free(line);
 	}
-	if (line[0] >= '0' && line[0] <= '9')
-		ft_loop2(cub, line, j, n);
+	i = 0;
+	while (line[i] == ' ')
+		i++;
+	if (line[i] == '1')
+	{
+		ft_loop(cub, line);
+		if (cub->map_w < ft_strlen(line))
+			cub->map_w = ft_strlen(line);
+	}
+	ft_map_size(cub);
 	free(line);
 }
 
-void	ft_resolution(t_cub *cub, char *line)
+void	ft_read_map(t_cub *cub, char *map_path)
 {
-	int i;
+	char	*line;
 
+	cub->screenheight = 0;
+	cub->screenwidth = 0;
+	cub->sprites_numb = 0;
+	cub->map_h = 0;
+	cub->map_w = 0;
+	line = NULL;
+	ft_read_map2(cub, map_path, line);
+	if (!(cub->spritex = malloc(sizeof(double) * cub->sprites_numb)))
+		return ;
+	if (!(cub->spritey = malloc(sizeof(double) * cub->sprites_numb)))
+		return ;
+	ft_map(cub, line, map_path);
+	free(line);
+	line = NULL;
+}
+
+void	ft_rgb_to_hex(char *buff_color, int time, int *pointer, t_cub *cub)
+{
+	int		i;
+	int		num;
+	int		div;
+
+	if (time == 1)
+		div = 256 * 256;
+	else if (time == 2)
+		div = 256;
+	else if (time == 3)
+		div = 1;
+	else
+		ft_error(cub, 2);
 	i = 0;
-	while (line[i])
+	num = 0;
+	while (buff_color[i])
 	{
-		if (cub->screenwidth == 0)
-			while (line[i] >= '0' && line[i] <= '9')
-			{
-				cub->screenwidth = cub->screenwidth * 10 +
-				(line[i] - '0');
-				i++;
-			}
-		else if (cub->screenheight == 0)
-			while (line[i] >= '0' && line[i] <= '9')
-			{
-				cub->screenheight = cub->screenheight * 10 +
-				(line[i] - '0');
-				i++;
-			}
-		if (line[i])
-			i++;
+		num = num * 10 + (buff_color[i] - '0');
+		i++;
 	}
+	if (num > 255 || num < 0)
+		ft_error(cub, 2);
+	*pointer = *pointer + num * div;
 }

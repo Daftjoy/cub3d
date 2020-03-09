@@ -6,7 +6,7 @@
 /*   By: antmarti <antmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/21 12:05:59 by antmarti          #+#    #+#             */
-/*   Updated: 2020/03/03 19:40:57 by antmarti         ###   ########.fr       */
+/*   Updated: 2020/03/09 20:45:32 by antmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,28 +38,28 @@
 
 typedef struct		s_cub
 {
-	double			posx; //posiciones de inicio del personaje
+	double			posx;
 	double			posy;
-	double			dirx; // dirección a la que mira el jugador
+	double			dirx;
 	double			olddirx;
 	double			diry;
-	double			planex; // plano de cámara del jugador -> es perpendicular al de dirección
+	double			planex;
 	double			oldplanex;
 	double			planey;
-	double			camerax; // lado de la pantalla en el que te encuentras, siendo  0 = centro, 1 = derecha y -1 = izquierda
-	double			raydirx; // dirección rayo de ray casting
+	double			camerax;
+	double			raydirx;
 	double			raydiry;
-	int				mapx; // posición actual del mapa en la que se encuentra el rayo
+	int				mapx;
 	int				mapy;
-	double			sidedistx; // distancia que el rayo tiene que hacer para avanzar la primera posición en el mapa
+	double			sidedistx;
 	double			sidedisty;
-	double			deltadistx; // distancia que el rayo tiene que hacer para avanzar una posición en el mapa
+	double			deltadistx;
 	double			deltadisty;
-	int				stepx; // dependen de la dirección del rayo y funciona igual 1 o -1
+	int				stepx;
 	int				stepy;
-	int				hit; // determina si se choca -> 1
-	int				side; // es 0 si se ha chocado con un x-side y 1 si ha sido con un y-side
-	double			perpwalldist; // largo del rayo
+	int				hit;
+	int				side;
+	double			perpwalldist;
 	int				lineheight;
 	int				drawstart;
 	int				drawend;
@@ -70,7 +70,6 @@ typedef struct		s_cub
 	int				bpp;
 	int				ls;
 	int				endian;
-	unsigned int	*dst;
 	double			rotspeed;
 	double			movespeed;
 	int				a;
@@ -150,6 +149,8 @@ typedef struct		s_cub
 	int				d_sprite;
 	int				map_h;
 	int				map_w;
+	int				music;
+	int				counter;
 }					t_cub;
 
 void				ft_read_map(t_cub *cub, char *map_path);
@@ -168,6 +169,7 @@ void				ft_assign_textures(t_cub *cub);
 void				ft_create_image(t_cub *cub);
 void				ft_create_image2(t_cub *cub, int width, int height);
 int					ft_exit_hook(void *param);
+void				ft_exit_hook2(t_cub *cub);
 void				ft_mlx(t_cub *cub);
 int					move_player(void *param);
 void				rotate_player_to_left(t_cub *cub);
@@ -190,19 +192,31 @@ char				*ft_strjoin(char *s1, char *s2);
 char				*ft_substr(char *s, int start, int len);
 char				*ft_strchr(char *s, int c);
 int					get_next_line(char **line, int fd);
-void				ft_rgb_to_hex(char *buff_color, int time, int *pointer);
+void				ft_rgb_to_hex(char *buff_color, int time, int *pointer,
+t_cub *cub);
 int					ft_append(int ret, char **file, int fd, char *buffer);
 int					ft_saver(char **file, char **line);
 int					ft_return_0(char *buffer, char **line);
 int					ft_return_1(char *buffer);
 void				ft_loop(t_cub *cub, char *line);
 int					ft_loop2(t_cub *cub, char *line, int j, int n);
-void				ft_map_size(t_cub *cub, char *map_path, char *line);
+void				ft_map_size(t_cub *cub);
 void				ft_map(t_cub *cub, char *line, char *map_path);
 char				*ft_path(char *line);
-void				ft_color(char *line, int *type);
+void				ft_color(char *line, int *type, t_cub *cub);
 void				ft_read_map2(t_cub *cub, char *map_path, char *line);
 void				ft_resolution(t_cub *cub, char *line);
 int					save_bmp(t_cub *cub);
-
+int					ft_map_error(t_cub *cub);
+int					ft_map_error_2(t_cub *cub, int i, int j);
+int					ft_path_duplicate(t_cub *cub, char *path);
+int					ft_color_duplicate(t_cub *cub, int color);
+void				ft_path_check(t_cub *cub);
+int					ft_atoi(const char *str);
+void				ft_error(t_cub *cub, int i);
+int					ft_strcmp(const char *s1, const char *s2);
+void				ft_error_2(t_cub *cub, int i);
+int					ft_loop3(t_cub *cub, char *line, int n, int *j);
+void				ft_read_map3(t_cub *cub, char *line, int i);
+void				ft_read_map4(t_cub *cub, char *line, int i);
 #endif
